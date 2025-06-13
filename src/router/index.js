@@ -8,7 +8,7 @@ import Sales from '@/views/Sales.vue';
 import Products from '@/views/Products.vue';
 import Warehouse from '@/views/Warehouse.vue';
 import CashRegisters from '@/views/CashRegisters.vue';
-import Orders from '@/views/Orders.vue';
+// import Orders from '@/views/Orders.vue'; // REMOVED
 import AddressBook from '@/views/AddressBook.vue';
 import Export from '@/views/Export.vue';
 import Settings from '@/views/Settings.vue';
@@ -43,11 +43,11 @@ const routes = [
     name: 'CashRegisters',
     component: CashRegisters
   },
-  {
-    path: '/orders',
-    name: 'Orders',
-    component: Orders
-  },
+  // {
+  //   path: '/orders', // REMOVED
+  //   name: 'Orders',
+  //   component: Orders
+  // },
   {
     path: '/address-book',
     name: 'AddressBook',

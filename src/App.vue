@@ -106,7 +106,7 @@ const navItems = [
   { title: 'Produkty', icon: 'mdi-tag', to: '/products' },
   { title: 'Sklad', icon: 'mdi-warehouse', to: '/warehouse' },
   { title: 'Pokladny', icon: 'mdi-cash-register', to: '/cash-registers' },
-  { title: 'Objednávky', icon: 'mdi-clipboard-text-outline', to: '/orders' },
+  // { title: 'Objednávky', icon: 'mdi-clipboard-text-outline', to: '/orders' }, // REMOVED
   { title: 'Adresář', icon: 'mdi-account-box-multiple', to: '/address-book' },
   { title: 'Export', icon: 'mdi-file-export', to: '/export' },
   { title: 'Nastavení', icon: 'mdi-cog', to: '/settings' },

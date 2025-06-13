@@ -46,7 +46,7 @@
         <div class="active-filters-container mb-4">
           <slot name="active-filters"></slot>
         </div>
-         
+        
         <v-dialog v-model="filterDialog" v-if="enableFilters">
           <v-card class="rounded-lg">
             <v-card-title class="d-flex justify-space-between align-center">
@@ -135,10 +135,10 @@
             </v-card-actions>
           </v-card>
         </v-dialog>
-         
+        
         <v-data-table
           :headers="visibleAndOrderedHeaders"
-           
+          
           :items="items"
 
           :item-value="itemKey"
@@ -193,7 +193,7 @@
             </div>
           </template>
         </v-data-table>
-         
+        
         <div class="d-block d-sm-none">
           <v-list lines="two" class="pa-0">
             <template v-for="item in paginatedMobileItems" :key="item.id">
@@ -427,8 +427,9 @@ const handleUpdateOptions = (options) => {
   display: flex;
   align-items: center;
   padding: 8px;
-  background-color: #f5f5f5;
-  border: 1px solid #ddd;
+  /* Use Vuetify theme variables for background and border */
+  background-color: rgb(var(--v-theme-surface-variant)); /* A lighter background that fits the theme */
+  border: 1px solid rgb(var(--v-theme-on-surface), 0.1); /* A subtle border from on-surface color */
   margin-bottom: 4px;
   border-radius: 4px;
 }
