@@ -4,15 +4,17 @@
       <v-card-text>
         <v-row align="center" class="mb-4">
           <v-col cols="12" sm="6" md="4" class="d-flex align-left">
-            <v-btn
-              v-if="additionalButton"
-              color="primary"
-              prepend-icon="mdi-plus"
-              @click="$emit('additional-button-click')"
-              class="flex-grow-1"
-            >
-              {{ additionalButtonText }}
-            </v-btn>
+            <slot name="header-left-content">
+              <v-btn
+                v-if="additionalButton"
+                color="primary"
+                prepend-icon="mdi-plus"
+                @click="$emit('additional-button-click')"
+                class="flex-grow-1"
+              >
+                {{ additionalButtonText }}
+              </v-btn>
+            </slot>
           </v-col>
 
           <v-col cols="12" sm="6" md="8" class="d-flex align-left">
@@ -44,7 +46,7 @@
         <div class="active-filters-container mb-4">
           <slot name="active-filters"></slot>
         </div>
-        
+         
         <v-dialog v-model="filterDialog" v-if="enableFilters">
           <v-card class="rounded-lg">
             <v-card-title class="d-flex justify-space-between align-center">
@@ -133,10 +135,10 @@
             </v-card-actions>
           </v-card>
         </v-dialog>
-        
+         
         <v-data-table
           :headers="visibleAndOrderedHeaders"
-          
+           
           :items="items"
 
           :item-value="itemKey"
@@ -191,7 +193,7 @@
             </div>
           </template>
         </v-data-table>
-        
+         
         <div class="d-block d-sm-none">
           <v-list lines="two" class="pa-0">
             <template v-for="item in paginatedMobileItems" :key="item.id">
@@ -295,7 +297,7 @@
 </template>
 
 <script setup>
-// Script setup zůstává beze změny
+// Script setup remains unchanged
 import { ref, computed, watch, watchEffect } from 'vue';
 import draggable from 'vuedraggable';
 
@@ -419,7 +421,7 @@ const handleUpdateOptions = (options) => {
 .draggable-list {
   list-style-type: none;
   padding: 0;
-  background-color: aquamarine;
+  /* background-color: aquamarine; */ /* Removed debugging color */
 }
 .draggable-item-table-settings {
   display: flex;
@@ -433,7 +435,7 @@ const handleUpdateOptions = (options) => {
 .draggable-item-table-settings .handle {
   cursor: grab;
   margin-right: 8px;
-  background-color: slategrey;
+  /* background-color: slategrey; */ /* Removed debugging color */
 }
 .hover-row :deep(tbody tr:hover) {
   cursor: pointer;
