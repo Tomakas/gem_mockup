@@ -1,3 +1,4 @@
+// File: /src/views/Sales.vue
 <template>
   <v-container fluid class="sales-list">
     <reusable-table
@@ -12,7 +13,6 @@
       :loading="loading"
       :additionalButton="false" :mobileTitleKey="viewMode === 'receipts' ? 'receiptNumber' : 'item'"
       :mobileExcludedKeys="viewMode === 'receipts' ? ['amount', 'paymentType'] : ['itemPrice', 'quantity', 'total']"
-      @row-click="handleRowClick"
       @apply-column-settings="saveColumnSettings"
       @reset-column-settings="resetColumnSettings"
       @apply-filters="applyFilters"
@@ -72,17 +72,6 @@
           :color="item.paymentType === 'Platba hotově' ? 'success' : 'info'">
           {{ item.paymentType }}
         </v-chip>
-      </template>
-
-      <template #actions="{ item }">
-        <v-btn v-if="viewMode === 'receipts'" icon size="small" variant="text" color="info"
-          @click.stop="viewReceipt(item)">
-          <v-icon>mdi-eye</v-icon>
-        </v-btn>
-        <v-btn v-else-if="viewMode === 'products'" icon size="small" variant="text" color="info"
-          @click.stop="viewProductDetail(item)">
-          <v-icon>mdi-eye</v-icon>
-        </v-btn>
       </template>
 
 <template #mobile-title="{ item }">
@@ -205,7 +194,8 @@ import ReusableTable from '/src/components/ReusableTable.vue';
 
 const loading = ref(false);
 
-const viewMode = ref('receipts'); // 'receipts' or 'products'
+const viewMode = ref('receipts');
+// 'receipts' or 'products'
 
 // --- Data Loading and Transformation ---
 const receiptsData = ref(receiptsDataRaw.map(r => ({
@@ -214,7 +204,6 @@ const receiptsData = ref(receiptsDataRaw.map(r => ({
   amount: parseFloat(r.amount) || 0,
   printed: parseInt(r.printed) || 0
 })));
-
 const salesData = ref(salesDataRaw.map(s => ({
   ...s,
   dateTime: s.dateTime ? new Date(s.dateTime) : null,
@@ -223,8 +212,6 @@ const salesData = ref(salesDataRaw.map(s => ({
   total: parseFloat(s.total) || 0,
   tax: parseInt(s.tax) || 0
 })).filter(s => s.item));
-
-
 // --- Filters for Receipts ---
 const receiptFilterPaymentType = ref(null);
 const receiptFilterUser = ref(null);
@@ -243,7 +230,6 @@ const productCategories = computed(() => [...new Set(salesData.value.map(s => s.
 
 // --- Dialogs ---
 const statsDialog = ref(false);
-
 // --- Search and Pagination handled by ReusableTable props and events ---
 const currentSearchTerm = ref('');
 const currentPage = ref(1);
@@ -260,9 +246,7 @@ const originalReceiptHeaders = [
   { title: 'Poznámka', key: 'note', align: 'start' },
   { title: 'Uživatel', key: 'user', align: 'start' },
   { title: 'Vytištěno', key: 'printed', align: 'center' },
-  { title: 'Akce', key: 'actions', align: 'center', sortable: false, fixed: true },
 ];
-
 const originalProductSalesHeaders = [
   { title: 'Účtenka', key: 'receiptNumber', align: 'start' },
   { title: 'Datum a čas', key: 'dateTime', align: 'start' },
@@ -273,17 +257,14 @@ const originalProductSalesHeaders = [
   { title: 'DPH', key: 'tax', align: 'end' },
   { title: 'Kategorie', key: 'category', align: 'start' },
   { title: 'Zákazník', key: 'customer', align: 'start' },
-  { title: 'Akce', key: 'actions', align: 'center', sortable: false, fixed: true },
 ];
 
 const receiptHeaders = ref(originalReceiptHeaders.map(h => ({ ...h, visible: true, key: h.key })));
 const productSalesHeaders = ref(originalProductSalesHeaders.map(h => ({ ...h, visible: true, key: h.key })));
-
 // Computed property to select the correct headers based on viewMode
 const currentHeaders = computed(() => {
   return viewMode.value === 'receipts' ? receiptHeaders.value : productSalesHeaders.value;
 });
-
 // Computed property for the actual items to display based on viewMode and filters
 const filteredAndSearchedItems = computed(() => {
   let itemsToFilter = viewMode.value === 'receipts' ? receiptsData.value : salesData.value;
@@ -338,7 +319,6 @@ const filteredAndSearchedItems = computed(() => {
 const totalSales = computed(() => {
   return receiptsData.value.reduce((sum, receipt) => sum + receipt.amount, 0);
 });
-
 const totalReceiptsCount = computed(() => {
   return receiptsData.value.length;
 });
@@ -346,26 +326,21 @@ const totalReceiptsCount = computed(() => {
 const itemsSold = computed(() => {
   return salesData.value.reduce((sum, item) => sum + item.quantity, 0);
 });
-
 const averageReceiptAmount = computed(() => {
   if (totalReceiptsCount.value === 0) return 0;
   return totalSales.value / totalReceiptsCount.value;
 });
-
 const averageProductPrice = computed(() => {
   if (salesData.value.length === 0) return 0;
   const total = salesData.value.reduce((sum, item) => sum + item.itemPrice, 0);
   return total / salesData.value.length;
 });
-
 // Utility function to check column visibility for mobile slots
 const isColumnVisible = (key) => {
   const headers = viewMode.value === 'receipts' ? receiptHeaders.value : productSalesHeaders.value;
   const header = headers.find((h) => h.key === key);
   return header ? header.visible : false;
 };
-
-
 // --- Lifecycle Hook for Loading Saved Column Settings ---
 onMounted(() => {
   const savedReceiptSettings = localStorage.getItem('salesReceiptColumnSettings');
@@ -378,34 +353,22 @@ onMounted(() => {
     productSalesHeaders.value = JSON.parse(savedProductSalesSettings);
   }
 });
-
 // --- Handlers for ReusableTable Events ---
 const handleSearchUpdate = (newSearch) => {
   currentSearchTerm.value = newSearch;
 };
-
 const handleItemsPerPageUpdate = (newItemsPerPage) => {
   currentItemsPerPage.value = newItemsPerPage;
 };
-
 const handlePageUpdate = (newPage) => {
   currentPage.value = newPage;
 };
-
 const loadItems = (options) => {
   loading.value = true;
   console.log('Loading items with options:', options);
   setTimeout(() => {
     loading.value = false;
   }, 300);
-};
-
-const handleRowClick = (item) => {
-  if (viewMode.value === 'receipts') {
-    viewReceipt(item);
-  } else {
-    viewProductDetail(item);
-  }
 };
 
 const saveColumnSettings = (newSettings) => {
@@ -417,7 +380,6 @@ const saveColumnSettings = (newSettings) => {
     localStorage.setItem('salesProductSalesColumnSettings', JSON.stringify(newSettings));
   }
 };
-
 const resetColumnSettings = () => {
   if (viewMode.value === 'receipts') {
     receiptHeaders.value = originalReceiptHeaders.map(h => ({ ...h, visible: true, key: h.key }));
@@ -427,12 +389,10 @@ const resetColumnSettings = () => {
     localStorage.removeItem('salesProductSalesColumnSettings');
   }
 };
-
 const applyFilters = () => {
   // ReusableTable automatically updates items when filters change.
   // This function is mostly for closing the dialog.
 };
-
 const clearFilters = () => {
   if (viewMode.value === 'receipts') {
     receiptFilterPaymentType.value = null;
@@ -448,27 +408,17 @@ const clearFilters = () => {
   }
   currentPage.value = 1;
 };
-
 // --- Utility Functions ---
 const formatCurrency = (value) => {
   if (value === null || value === undefined) return '';
   return new Intl.NumberFormat('cs-CZ', { style: 'currency', currency: 'CZK' }).format(value);
 };
-
 const formatDateTime = (date) => {
   if (!date || isNaN(new Date(date).getTime())) {
     return '-';
   }
   const options = { year: 'numeric', month: '2-digit', day: '2-digit', hour: '2-digit', minute: '2-digit' };
   return new Date(date).toLocaleDateString('cs-CZ', options);
-};
-
-const viewReceipt = (item) => {
-  alert(`Zobrazit detail účtenky: ${item.receiptNumber}`);
-};
-
-const viewProductDetail = (item) => {
-  alert(`Zobrazit detail produktu: ${item.item} (Účtenka: ${item.receiptNumber})`);
 };
 
 // Watch for viewMode changes to update headers and reset search/filters

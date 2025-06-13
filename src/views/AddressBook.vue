@@ -1,3 +1,4 @@
+// File: /src/views/AddressBook.vue
 <template>
   <v-container fluid class="customers-list">
     <reusable-table
@@ -15,7 +16,6 @@
       @additional-button-click="addNewCustomer"
       mobileTitleKey="name"
       :mobileExcludedKeys="['email', 'phone']"
-      @row-click="editCustomer"
       @apply-column-settings="saveCustomerColumnSettings"
       @reset-column-settings="resetCustomerColumnSettings"
       @apply-filters="applyFilters"
@@ -50,47 +50,6 @@
         </div>
       </template>
 
-      <template #actions="{ item }">
-        <v-btn
-          icon
-          size="small"
-          variant="text"
-          color="warning"
-          class="mr-1"
-          @click.stop="editCustomer(item)"
-        >
-          <v-icon>mdi-pencil</v-icon>
-        </v-btn>
-        <v-btn
-          icon
-          size="small"
-          variant="text"
-          color="error"
-          class="mr-1"
-          @click.stop="deleteCustomer(item)"
-        >
-          <v-icon>mdi-delete</v-icon>
-        </v-btn>
-        <v-menu>
-          <template v-slot:activator="{ props }">
-            <v-btn icon size="small" variant="text" v-bind="props" @click.stop>
-              <v-icon>mdi-dots-vertical</v-icon>
-            </v-btn>
-          </template>
-          <v-list>
-            <v-list-item @click="viewSales(item)">
-              <v-list-item-title>Prodeje</v-list-item-title>
-            </v-list-item>
-            <v-list-item @click="duplicateCustomer(item)">
-              <v-list-item-title>Duplikovat</v-list-item-title>
-            </v-list-item>
-            <v-list-item @click="mergeCustomers(item)">
-              <v-list-item-title>Sloučit</v-list-item-title>
-            </v-list-item>
-          </v-list>
-        </v-menu>
-      </template>
-
       <template #mobile-title="{ item }">
         {{ item.name }}
       </template>
@@ -105,7 +64,8 @@
 import { ref, computed, onMounted } from 'vue';
 import ReusableTable from '/src/components/ReusableTable.vue'; // Cesta k ReusableTable
 
-const loading = ref(false); // Pro indikaci načítání dat (např. z API)
+const loading = ref(false);
+// Pro indikaci načítání dat (např. z API)
 
 // Stavy pro filtry (zůstávají zde, protože jsou specifické pro zákazníky)
 const filterRole = ref(null);
@@ -118,9 +78,7 @@ const customerHeaders = ref([
   { title: 'Email', key: 'email', align: 'start' },
   { title: 'Telefon', key: 'phone', align: 'start' },
   { title: 'Role', key: 'role', align: 'start' },
-  { title: 'Akce', key: 'actions', align: 'center', sortable: false, fixed: true }, // Akce jako fixed
 ]);
-
 // Fiktivní data pro zákazníky
 const customers = ref([
   { id: 1, name: 'Samantha Lee', email: 'samantha.lee@example.com', phone: '+420 777 123 456', role: 'Zákazník' },
@@ -144,11 +102,12 @@ const customers = ref([
   { id: 19, name: 'Eliška Horáková', email: 'eliska.horakova@example.com', phone: '+420 605 987 654', role: 'Zákazník' },
   { id: 20, name: 'Filip Beneš', email: 'filip.benes@example.com', phone: '+420 731 321 098', role: 'Dodavatel' },
 ]);
-
 // Proměnné pro stav vyhledávání a stránkování z ReusableTable
 const currentSearchTerm = ref('');
-// const currentPage = ref(1); // ReusableTable si spravuje vlastní stránkování
-// const currentItemsPerPage = ref(10); // ReusableTable si spravuje vlastní itemsPerPage
+// const currentPage = ref(1);
+// ReusableTable si spravuje vlastní stránkování
+// const currentItemsPerPage = ref(10);
+// ReusableTable si spravuje vlastní itemsPerPage
 
 // Computed property pro filtrované zákazníky
 const filteredCustomers = computed(() => {
@@ -185,15 +144,12 @@ const filteredCustomers = computed(() => {
 const handleSearchUpdate = (newSearch) => {
   currentSearchTerm.value = newSearch;
 };
-
 const handleItemsPerPageUpdate = (newItemsPerPage) => {
   // currentItemsPerPage.value = newItemsPerPage; // ReusableTable si spravuje interně
 };
-
 const handlePageUpdate = (newPage) => {
   // currentPage.value = newPage; // ReusableTable si spravuje interně
 };
-
 const loadItems = (options) => {
   loading.value = true;
   console.log('Načítám zákazníky s možnostmi:', options);
@@ -208,32 +164,6 @@ const loadItems = (options) => {
 const addNewCustomer = () => {
   console.log('Funkce pro přidání nového zákazníka bude implementována.');
   // Zde byste otevřeli dialog pro přidání nového zákazníka
-};
-
-const editCustomer = (item) => {
-  console.log(`Upravit zákazníka: ${item.name} (ID: ${item.id})`);
-  // Zde byste otevřeli dialog pro úpravu zákazníka
-};
-
-const deleteCustomer = (item) => {
-  if (confirm(`Opravdu chcete smazat zákazníka: ${item.name}?`)) {
-    console.log(`Zákazník ${item.name} smazán.`);
-    customers.value = customers.value.filter(c => c.id !== item.id);
-  }
-};
-
-const viewSales = (item) => {
-  console.log(`Zobrazit prodeje pro zákazníka: ${item.name} (ID: ${item.id})`);
-};
-
-const duplicateCustomer = (item) => {
-  console.log(`Duplikovat zákazníka: ${item.name} (ID: ${item.id})`);
-  const duplicated = { ...item, id: customers.value.length + 1, name: `${item.name} (Kopie)` };
-  customers.value.push(duplicated);
-};
-
-const mergeCustomers = (item) => {
-  console.log(`Sloučit zákazníka: ${item.name} (ID: ${item.id}) s jiným.`);
 };
 
 // Funkce pro aplikaci filtru (volá se z ReusableTable)
