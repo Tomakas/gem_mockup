@@ -1,0 +1,167 @@
+[
+  {
+    "receiptNumber": "DXCT001",
+    "dateTime": "2025-06-10T13:12:00",
+    "item": "Krettirolo",
+    "itemPrice": 45.00,
+    "quantity": 1.00,
+    "total": 45.00,
+    "tax": 9,
+    "category": "Trubičky",
+    "customer": ""
+  },
+  {
+    "receiptNumber": "DXCT001",
+    "dateTime": "2025-06-10T13:12:00",
+    "item": "1dcl Modrý Portugal, suché",
+    "itemPrice": 30.00,
+    "quantity": 1.00,
+    "total": 30.00,
+    "tax": 9,
+    "category": "Stáčené do skleničky",
+    "customer": ""
+  },
+  {
+    "receiptNumber": "DXCT001",
+    "dateTime": "2025-06-10T13:12:00",
+    "item": "SPRITZ 11",
+    "itemPrice": 129.00,
+    "quantity": 4.00,
+    "total": 516.00,
+    "tax": 9,
+    "category": "Perlivé stáčené",
+    "customer": ""
+  },
+  {
+    "receiptNumber": "DXCT002",
+    "dateTime": "2025-06-10T13:12:00",
+    "item": "Odnoska na 2 vína",
+    "itemPrice": 45.00,
+    "quantity": 1.00,
+    "total": 45.00,
+    "tax": 9,
+    "category": "Obaly",
+    "customer": ""
+  },
+  {
+    "receiptNumber": "DXCT002",
+    "dateTime": "2025-06-10T13:12:00",
+    "item": "Cabernet Cuvée PS, SU - Urbana",
+    "itemPrice": 178.00,
+    "quantity": 1.00,
+    "total": 178.00,
+    "tax": 9,
+    "category": "Urbana",
+    "customer": "Urbana"
+  },
+  {
+    "receiptNumber": "DXCT002",
+    "dateTime": "2025-06-10T13:12:00",
+    "item": "Svatovavřinecké, MZ. Spakik",
+    "itemPrice": 194.00,
+    "quantity": 1.00,
+    "total": 194.00,
+    "tax": 9,
+    "category": "Spalek",
+    "customer": "Spalek"
+  },
+  {
+    "receiptNumber": "DXCT003",
+    "dateTime": "2025-06-10T13:12:00",
+    "item": "Sleva SPRITZ 11",
+    "itemPrice": -129.00,
+    "quantity": 1.00,
+    "total": -129.00,
+    "tax": 0,
+    "category": "",
+    "customer": ""
+  },
+  {
+    "receiptNumber": "DXCT004",
+    "dateTime": "2025-06-10T13:10:00",
+    "item": "Espresso",
+    "itemPrice": 60.00,
+    "quantity": 1.00,
+    "total": 60.00,
+    "tax": 9,
+    "category": "Káva",
+    "customer": "Jan Novák"
+  },
+  {
+    "receiptNumber": "DXCT004",
+    "dateTime": "2025-06-10T13:05:00",
+    "item": "Dort čokoládový",
+    "itemPrice": 85.00,
+    "quantity": 2.00,
+    "total": 170.00,
+    "tax": 15,
+    "category": "Dorty",
+    "customer": "Petra Veselá"
+  },
+  {
+    "receiptNumber": "DXCT005",
+    "dateTime": "2025-06-10T12:50:00",
+    "item": "Džus pomerančový",
+    "itemPrice": 40.00,
+    "quantity": 3.00,
+    "total": 120.00,
+    "tax": 15,
+    "category": "Nápoje",
+    "customer": "Pavel Král"
+  },
+  {
+    "receiptNumber": "DXCT006",
+    "dateTime": "2025-06-10T12:45:00",
+    "item": "Bageta šunková",
+    "itemPrice": 70.00,
+    "quantity": 1.00,
+    "total": 70.00,
+    "tax": 15,
+    "category": "Svačiny",
+    "customer": "Lucie Bílá"
+  },
+  {
+    "receiptNumber": "DXCT006",
+    "dateTime": "2025-06-10T12:45:00",
+    "item": "Coca Cola 0.5L",
+    "itemPrice": 35.00,
+    "quantity": 1.00,
+    "total": 35.00,
+    "tax": 21,
+    "category": "Nápoje",
+    "customer": "Lucie Bílá"
+  },
+  {
+    "receiptNumber": "DXCT007",
+    "dateTime": "2025-06-10T12:30:00",
+    "item": "Voda perlivá",
+    "itemPrice": 25.00,
+    "quantity": 4.00,
+    "total": 100.00,
+    "tax": 21,
+    "category": "Nápoje",
+    "customer": "Tomáš Marný"
+  },
+  {
+    "receiptNumber": "DXCT007",
+    "dateTime": "2025-06-10T12:30:00",
+    "item": "Čokoládová tyčinka",
+    "itemPrice": 30.00,
+    "quantity": 2.00,
+    "total": 60.00,
+    "tax": 15,
+    "category": "Sladkosti",
+    "customer": "Tomáš Marný"
+  },
+  {
+    "receiptNumber": "DXCT008",
+    "dateTime": "2025-06-10T12:15:00",
+    "item": "Káva Latte",
+    "itemPrice": 75.00,
+    "quantity": 1.00,
+    "total": 75.00,
+    "tax": 9,
+    "category": "Káva",
+    "customer": "Monika Kvapilová"
+  }
+]

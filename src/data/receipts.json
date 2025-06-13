@@ -1,0 +1,233 @@
+[
+  {
+    "receiptNumber": "DXCT001",
+    "dateTime": "2025-06-10T14:20:00",
+    "cashRegister": "EPOS - X3CT",
+    "amount": 100.00,
+    "paymentType": "Platba hotově",
+    "customer": "",
+    "note": "",
+    "user": "Petra33",
+    "printed": 0
+  },
+  {
+    "receiptNumber": "DXCT002",
+    "dateTime": "2025-06-10T14:14:00",
+    "cashRegister": "EPOS - X3CT",
+    "amount": 160.00,
+    "paymentType": "Platba kartou",
+    "customer": "",
+    "note": "",
+    "user": "Petra33",
+    "printed": 0
+  },
+  {
+    "receiptNumber": "DXCT003",
+    "dateTime": "2025-06-10T13:41:00",
+    "cashRegister": "EPOS - X3CT",
+    "amount": 160.00,
+    "paymentType": "Platba kartou",
+    "customer": "",
+    "note": "",
+    "user": "Petra33",
+    "printed": 0
+  },
+  {
+    "receiptNumber": "DXCT004",
+    "dateTime": "2025-06-10T13:12:00",
+    "cashRegister": "EPOS - X3CT",
+    "amount": 879.00,
+    "paymentType": "Platba kartou",
+    "customer": "",
+    "note": "",
+    "user": "Petra33",
+    "printed": 0
+  },
+  {
+    "receiptNumber": "DXCT005",
+    "dateTime": "2025-06-10T12:43:00",
+    "cashRegister": "EPOS - X3CT",
+    "amount": 230.00,
+    "paymentType": "Platba kartou",
+    "customer": "",
+    "note": "",
+    "user": "Petra33",
+    "printed": 0
+  },
+  {
+    "receiptNumber": "DXCT006",
+    "dateTime": "2025-06-10T12:42:00",
+    "cashRegister": "EPOS - X3CT",
+    "amount": 200.00,
+    "paymentType": "Platba hotově",
+    "customer": "",
+    "note": "",
+    "user": "Jan.Kovac",
+    "printed": 0
+  },
+  {
+    "receiptNumber": "DXCT007",
+    "dateTime": "2025-06-10T12:33:00",
+    "cashRegister": "EPOS - X3CT",
+    "amount": 135.00,
+    "paymentType": "Platba hotově",
+    "customer": "",
+    "note": "",
+    "user": "Petra33",
+    "printed": 0
+  },
+  {
+    "receiptNumber": "DXCT008",
+    "dateTime": "2025-06-10T12:00:00",
+    "cashRegister": "EPOS - X3CT",
+    "amount": 50.00,
+    "paymentType": "Platba hotově",
+    "customer": "Jan Novák",
+    "note": "",
+    "user": "Jan.Kovac",
+    "printed": 1
+  },
+  {
+    "receiptNumber": "DXCT009",
+    "dateTime": "2025-06-10T11:55:00",
+    "cashRegister": "EPOS - X3CT",
+    "amount": 250.00,
+    "paymentType": "Platba kartou",
+    "customer": "Alice Smith",
+    "note": "Vrácené zboží",
+    "user": "Petra33",
+    "printed": 0
+  },
+  {
+    "receiptNumber": "DXCT010",
+    "dateTime": "2025-06-10T11:45:00",
+    "cashRegister": "EPOS - X3CT",
+    "amount": 300.00,
+    "paymentType": "Platba hotově",
+    "customer": "",
+    "note": "",
+    "user": "Admin",
+    "printed": 1
+  },
+  {
+    "receiptNumber": "DXCT011",
+    "dateTime": "2025-06-10T11:30:00",
+    "cashRegister": "EPOS - X3CT",
+    "amount": 120.00,
+    "paymentType": "Platba kartou",
+    "customer": "Bob Johnson",
+    "note": "",
+    "user": "Petra33",
+    "printed": 0
+  },
+  {
+    "receiptNumber": "DXCT012",
+    "dateTime": "2025-06-10T11:15:00",
+    "cashRegister": "EPOS - X3CT",
+    "amount": 400.00,
+    "paymentType": "Platba hotově",
+    "customer": "",
+    "note": "Velká objednávka",
+    "user": "Jan.Kovac",
+    "printed": 1
+  },
+  {
+    "receiptNumber": "DXCT013",
+    "dateTime": "2025-06-10T11:00:00",
+    "cashRegister": "EPOS - X3CT",
+    "amount": 80.00,
+    "paymentType": "Platba kartou",
+    "customer": "Eva Green",
+    "note": "",
+    "user": "Petra33",
+    "printed": 0
+  },
+  {
+    "receiptNumber": "DXCT014",
+    "dateTime": "2025-06-10T10:45:00",
+    "cashRegister": "EPOS - X3CT",
+    "amount": 180.00,
+    "paymentType": "Platba hotově",
+    "customer": "David Brown",
+    "note": "",
+    "user": "Admin",
+    "printed": 0
+  },
+  {
+    "receiptNumber": "DXCT015",
+    "dateTime": "2025-06-10T10:30:00",
+    "cashRegister": "EPOS - X3CT",
+    "amount": 210.00,
+    "paymentType": "Platba kartou",
+    "customer": "",
+    "note": "",
+    "user": "Petra33",
+    "printed": 1
+  },
+  {
+    "receiptNumber": "DXCT016",
+    "dateTime": "2025-06-10T10:15:00",
+    "cashRegister": "EPOS - X3CT",
+    "amount": 70.00,
+    "paymentType": "Platba hotově",
+    "customer": "Frank White",
+    "note": "",
+    "user": "Jan.Kovac",
+    "printed": 0
+  },
+  {
+    "receiptNumber": "DXCT017",
+    "dateTime": "2025-06-10T10:00:00",
+    "cashRegister": "EPOS - X3CT",
+    "amount": 320.00,
+    "paymentType": "Platba kartou",
+    "customer": "",
+    "note": "",
+    "user": "Admin",
+    "printed": 1
+  },
+  {
+    "receiptNumber": "DXCT018",
+    "dateTime": "2025-06-10T09:45:00",
+    "cashRegister": "EPOS - X3CT",
+    "amount": 95.00,
+    "paymentType": "Platba hotově",
+    "customer": "Grace Black",
+    "note": "",
+    "user": "Petra33",
+    "printed": 0
+  },
+  {
+    "receiptNumber": "DXCT019",
+    "dateTime": "2025-06-10T09:30:00",
+    "cashRegister": "EPOS - X3CT",
+    "amount": 140.00,
+    "paymentType": "Platba kartou",
+    "customer": "",
+    "note": "",
+    "user": "Jan.Kovac",
+    "printed": 0
+  },
+  {
+    "receiptNumber": "DXCT020",
+    "dateTime": "2025-06-10T09:15:00",
+    "cashRegister": "EPOS - X3CT",
+    "amount": 280.00,
+    "paymentType": "Platba hotově",
+    "customer": "Harry Green",
+    "note": "",
+    "user": "Admin",
+    "printed": 1
+  },
+  {
+    "receiptNumber": "DXCT021",
+    "dateTime": "2025-06-10T09:00:00",
+    "cashRegister": "EPOS - X3CT",
+    "amount": 65.00,
+    "paymentType": "Platba kartou",
+    "customer": "",
+    "note": "",
+    "user": "Petra33",
+    "printed": 0
+  }
+]
