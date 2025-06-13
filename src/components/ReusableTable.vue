@@ -164,10 +164,6 @@
             </td>
           </template>
 
-          <template #item.actions="{ item }">
-            <slot name="actions" :item="item"></slot>
-          </template>
-
           <template #bottom>
             <div class="d-flex justify-space-between align-center px-4 py-2">
               <v-select
