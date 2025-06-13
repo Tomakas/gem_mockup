@@ -1,3 +1,5 @@
+// File: /src/components/ReusableTable.vue
+
 <template>
   <v-container fluid class="generic-list">
     <v-card>
@@ -46,6 +48,7 @@
         <div class="active-filters-container mb-4">
           <slot name="active-filters"></slot>
         </div>
+        
         
         <v-dialog v-model="filterDialog" v-if="enableFilters">
           <v-card class="rounded-lg">
@@ -138,9 +141,7 @@
         
         <v-data-table
           :headers="visibleAndOrderedHeaders"
-          
           :items="items"
-
           :item-value="itemKey"
           :search="internalSearch"
           :items-per-page="internalItemsPerPage"
@@ -297,9 +298,8 @@
 </template>
 
 <script setup>
-// Script setup remains unchanged
-import { ref, computed, watch, watchEffect } from 'vue';
-import draggable from 'vuedraggable';
+import { ref, computed, watch, watchEffect } from 'vue'; // 
+import draggable from 'vuedraggable'; // 
 
 const props = defineProps({
   headers: { type: Array, required: true },
@@ -313,11 +313,10 @@ const props = defineProps({
   additionalButton: { type: Boolean, default: false },
   additionalButtonText: { type: String, default: '' },
   mobileTitleKey: { type: String, required: true },
-  mobileExcludedKeys: { type: Array, default: () => [] },
+  mobileExcludedKeys: { type: Array, default: () => [] }, // 
   loading: { type: Boolean, default: false },
 });
-
-const emit = defineEmits([
+const emit = defineEmits([ // 
   'row-click',
   'apply-filters',
   'clear-filters',
@@ -329,35 +328,41 @@ const emit = defineEmits([
   'apply-column-settings',
   'reset-column-settings'
 ]);
-
-const internalSearch = ref('');
+const internalSearch = ref(''); // 
 const internalPage = ref(1);
 const internalItemsPerPage = ref(10);
 const filterDialog = ref(false);
 const columnSettingsDialog = ref(false);
+const currentColumnSettings = ref([]); // 
 
-const currentColumnSettings = ref([]);
+// Original column settings are now a computed property based on props.headers
+// This ensures it updates if props.headers change.
 const originalColumnSettings = computed(() =>
   props.headers.map((h) => ({
     ...h,
     visible: h.visible !== undefined ? h.visible : true,
     key: h.key,
   }))
-);
+); // 
 
-watchEffect(() => {
-  if (props.headers.length > 0 && currentColumnSettings.value.length === 0) {
-    currentColumnSettings.value = JSON.parse(JSON.stringify(originalColumnSettings.value));
-  }
-});
+// Watch for changes in props.headers and re-initialize currentColumnSettings
+// This is the key change to fix the issue.
+watch(() => props.headers, (newHeaders) => {
+  // Deep copy to ensure independence from original props and allow modification
+  currentColumnSettings.value = JSON.parse(JSON.stringify(newHeaders.map(h => ({
+    ...h,
+    visible: h.visible !== undefined ? h.visible : true,
+    key: h.key,
+  }))));
+}, { immediate: true }); //  (Modified to include immediate for initial setup and react to changes)
 
-const visibleAndOrderedHeaders = computed(() => {
+
+const visibleAndOrderedHeaders = computed(() => { // 
   return currentColumnSettings.value.filter((h) => h.visible);
 });
-
-const isColumnVisible = (key) => {
+const isColumnVisible = (key) => { // 
   const header = currentColumnSettings.value.find((h) => h.key === key);
-  return header ? header.visible : false;
+  return header ? header.visible : false; // 
 };
 
 const paginatedMobileItems = computed(() => {
@@ -365,18 +370,15 @@ const paginatedMobileItems = computed(() => {
   const end = start + internalItemsPerPage.value;
   return props.items.slice(start, end);
 });
-
-watch(internalSearch, (newSearch) => {
+watch(internalSearch, (newSearch) => { // 
   emit('update:search', newSearch);
   internalPage.value = 1;
 });
-
-watch(internalItemsPerPage, (newItemsPerPage) => {
+watch(internalItemsPerPage, (newItemsPerPage) => { // 
   emit('update:itemsPerPage', newItemsPerPage);
   internalPage.value = 1;
 });
-
-watch(internalPage, (newPage) => {
+watch(internalPage, (newPage) => { // 
   emit('update:page', newPage);
   emit('load-items', {
     page: newPage,
@@ -384,30 +386,25 @@ watch(internalPage, (newPage) => {
     search: internalSearch.value,
   });
 });
-
-const applyFiltersAndClose = () => {
+const applyFiltersAndClose = () => { // 
   emit('apply-filters');
   internalPage.value = 1;
   filterDialog.value = false;
 };
-
-const clearFiltersAndClose = () => {
+const clearFiltersAndClose = () => { // 
   emit('clear-filters');
   internalPage.value = 1;
   filterDialog.value = false;
 };
-
-const applyColumnSettingsAndClose = () => {
+const applyColumnSettingsAndClose = () => { // 
   emit('apply-column-settings', currentColumnSettings.value);
   columnSettingsDialog.value = false;
 };
-
-const resetColumnSettings = () => {
+const resetColumnSettings = () => { // 
   currentColumnSettings.value = JSON.parse(JSON.stringify(originalColumnSettings.value));
   emit('reset-column-settings');
 };
-
-const handleUpdateOptions = (options) => {
+const handleUpdateOptions = (options) => { // 
   emit('load-items', options);
 };
 </script>
@@ -415,30 +412,29 @@ const handleUpdateOptions = (options) => {
 <style scoped>
 /* Styly zůstávají stejné */
 .column-settings-container {
-  max-height: 400px;
+  max-height: 400px; /*  */
   overflow-y: auto;
 }
 .draggable-list {
   list-style-type: none;
   padding: 0;
-  /* background-color: aquamarine; */ /* Removed debugging color */
+  /* background-color: aquamarine; */ /*  */ /* Removed debugging color */
 }
 .draggable-item-table-settings {
   display: flex;
   align-items: center;
-  padding: 8px;
-  /* Use Vuetify theme variables for background and border */
-  background-color: rgb(var(--v-theme-surface-variant)); /* A lighter background that fits the theme */
-  border: 1px solid rgb(var(--v-theme-on-surface), 0.1); /* A subtle border from on-surface color */
+  padding: 8px; /*  */ /* Use Vuetify theme variables for background and border */
+  background-color: rgb(var(--v-theme-surface-variant)); /*  */ /* A lighter background that fits the theme */
+  border: 1px solid rgb(var(--v-theme-on-surface), 0.1); /*  */ /* A subtle border from on-surface color */
   margin-bottom: 4px;
   border-radius: 4px;
 }
 .draggable-item-table-settings .handle {
-  cursor: grab;
+  cursor: grab; /*  */
   margin-right: 8px;
   /* background-color: slategrey; */ /* Removed debugging color */
 }
 .hover-row :deep(tbody tr:hover) {
-  cursor: pointer;
+  cursor: pointer; /*  */
 }
 </style>

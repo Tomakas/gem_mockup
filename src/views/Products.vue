@@ -101,11 +101,7 @@
       </template>
       <template #cell-tax="{ item }">{{ item.tax }} %</template>
       <template #cell-price="{ item }">{{ formatCurrency(item.price) }}</template>
-      <template #actions="{ item }">
-        <v-btn icon size="small" variant="text" color="info" @click.stop="openProductDetail(item)">
-          <v-icon>mdi-eye</v-icon>
-        </v-btn>
-      </template>
+    
       <template #mobile-title="{ item }">
         {{ item.productName }}
       </template>
