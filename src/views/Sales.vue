@@ -85,10 +85,10 @@
         </v-btn>
       </template>
 
-      <template #mobile-title="{ item }">
-        <span v-if="viewMode === 'receipts'">Účtenka: {{ item.receiptNumber || '-' }}</span>
-        <span v-else-if="viewMode === 'products'">Položka: {{ item.item }}</span>
-      </template>
+<template #mobile-title="{ item }">
+  <span v-if="viewMode === 'receipts'">{{ item.receiptNumber || '-' }}</span>
+  <span v-else-if="viewMode === 'products'">{{ item.item }}</span>
+</template>
 
       <template #mobile-cell-dateTime="{ item }">
         {{ formatDateTime(item.dateTime) }}
