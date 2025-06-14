@@ -136,8 +136,8 @@ const productDetailDialog = ref(false);
 const selectedProduct = ref(null);
 
 const originalHeaders = [
-  { title: 'Název produktu', key: 'productName', dataAlign: 'start', mandatory: true },
-  { title: 'Kategorie', key: 'category', dataAlign: 'start' },
+  { title: 'Název produktu', key: 'productName', dataAlign: 'end', mandatory: true },
+  { title: 'Kategorie', key: 'category', dataAlign: 'end' },
   { title: 'Cena', key: 'price', dataAlign: 'end', mandatory: true },
   { title: 'Daň', key: 'tax', dataAlign: 'end' },
   { title: 'Barva', key: 'Barva', dataAlign: 'center', visible: true },

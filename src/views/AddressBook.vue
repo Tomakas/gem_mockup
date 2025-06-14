@@ -74,10 +74,10 @@ const filterPhonePrefix = ref('');
 // Původní hlavičky, které budou sloužit jako "reset" a pro získání všech možných sloupců
 // Důležité je zde definovat headers jako jednoduchý Array, ReusableTable si spravuje viditelnost
 const customerHeaders = ref([
-  { title: 'Jméno', key: 'name', align: 'start', mandatory: true }, // "Jméno" jako fixed
-  { title: 'Email', key: 'email', align: 'start' },
-  { title: 'Telefon', key: 'phone', align: 'start' },
-  { title: 'Role', key: 'role', align: 'start' },
+  { title: 'Jméno', key: 'name', dataAlign: 'center', mandatory: true }, // "Jméno" jako fixed
+  { title: 'Email', key: 'email', dataAlign: 'center' },
+  { title: 'Telefon', key: 'phone', dataAlign: 'center' },
+  { title: 'Role', key: 'role', dataAlign: 'center' },
 ]);
 // Fiktivní data pro zákazníky
 const customers = ref([

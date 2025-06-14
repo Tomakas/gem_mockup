@@ -74,10 +74,10 @@
         </v-chip>
       </template>
 
-<template #mobile-title="{ item }">
-  <span v-if="viewMode === 'receipts'">{{ item.receiptNumber || '-' }}</span>
-  <span v-else-if="viewMode === 'products'">{{ item.item }}</span>
-</template>
+      <template #mobile-title="{ item }">
+        <span v-if="viewMode === 'receipts'">{{ item.receiptNumber || '-' }}</span>
+        <span v-else-if="viewMode === 'products'">{{ item.item }}</span>
+      </template>
 
       <template #mobile-cell-dateTime="{ item }">
         {{ formatDateTime(item.dateTime) }}
@@ -192,6 +192,37 @@ import receiptsDataRaw from '/src/data/receipts.json';
 import salesDataRaw from '/src/data/sales.json';
 import ReusableTable from '/src/components/ReusableTable.vue';
 
+/**
+ * Sloučí původní definice hlaviček s uloženým nastavením.
+ * Zachová pořadí a viditelnost z uložených, ale doplní klíčové vlastnosti
+ * (mandatory, align, atd.) z původních definic.
+ * @param {Array} originalDefs Původní pole definic z kódu.
+ * @param {Array} savedSettings Pole nastavení načtené z localStorage.
+ * @returns {Array} Sloučené pole hlaviček.
+ */
+const mergeHeaders = (originalDefs, savedSettings) => {
+  const originalMap = new Map(originalDefs.map(item => [item.key, item]));
+  const merged = savedSettings.map(saved => {
+    const original = originalMap.get(saved.key);
+    if (original) {
+      // Vezme všechny vlastnosti z původní definice a přepíše je uloženými
+      // Tím je zajištěno, že `mandatory` a další vlastnosti z kódu zůstanou zachovány.
+      return { ...original, ...saved };
+    }
+    return null; // Pokud sloupec v nové verzi už neexistuje
+  }).filter(Boolean); // Odstraní neexistující sloupce
+
+  // Přidá nové sloupce, které ještě nejsou v uloženém nastavení
+  originalDefs.forEach(original => {
+    if (!merged.some(m => m.key === original.key)) {
+      merged.push(original);
+    }
+  });
+
+  return merged;
+};
+
+
 const loading = ref(false);
 
 const viewMode = ref('receipts');
@@ -240,7 +271,7 @@ const originalReceiptHeaders = [
   { title: 'Datum a čas', key: 'dateTime', align: 'start', mandatory: true },
   { title: 'Číslo účtenky', key: 'receiptNumber', align: 'start' },
   { title: 'Pokladna', key: 'cashRegister', align: 'start' },
-  { title: 'Částka', key: 'amount', align: 'start', mandatory: true },
+  { title: 'Částka', key: 'amount', align: 'end', mandatory: true },
   { title: 'Typ platby', key: 'paymentType', align: 'start' },
   { title: 'Zákazník', key: 'customer', align: 'start' },
   { title: 'Poznámka', key: 'note', align: 'start' },
@@ -253,7 +284,7 @@ const originalProductSalesHeaders = [
   { title: 'Položka', key: 'item', align: 'start' },
   { title: 'Cena za položku', key: 'itemPrice', align: 'end' },
   { title: 'Množství', key: 'quantity', align: 'end' },
-  { title: 'Celkem', key: 'total', align: 'start', mandatory: true },
+  { title: 'Celkem', key: 'total', align: 'end', mandatory: true },
   { title: 'DPH', key: 'tax', align: 'end' },
   { title: 'Kategorie', key: 'category', align: 'start' },
   { title: 'Zákazník', key: 'customer', align: 'start' },
@@ -261,6 +292,8 @@ const originalProductSalesHeaders = [
 
 const receiptHeaders = ref(originalReceiptHeaders);
 const productSalesHeaders = ref(originalProductSalesHeaders);
+
+// Computed property to select the correct headers based on viewMode
 const currentHeaders = computed(() => {
   return viewMode.value === 'receipts' ? receiptHeaders.value : productSalesHeaders.value;
 });
@@ -344,12 +377,22 @@ const isColumnVisible = (key) => {
 onMounted(() => {
   const savedReceiptSettings = localStorage.getItem('salesReceiptColumnSettings');
   if (savedReceiptSettings) {
-    receiptHeaders.value = JSON.parse(savedReceiptSettings);
+    try {
+      receiptHeaders.value = mergeHeaders(originalReceiptHeaders, JSON.parse(savedReceiptSettings));
+    } catch (e) {
+      console.error("Chyba při parsování nastavení sloupců pro účtenky:", e);
+      localStorage.removeItem('salesReceiptColumnSettings'); // Odstraní poškozená data
+    }
   }
 
   const savedProductSalesSettings = localStorage.getItem('salesProductSalesColumnSettings');
   if (savedProductSalesSettings) {
-    productSalesHeaders.value = JSON.parse(savedProductSalesSettings);
+    try {
+      productSalesHeaders.value = mergeHeaders(originalProductSalesHeaders, JSON.parse(savedProductSalesSettings));
+    } catch (e) {
+      console.error("Chyba při parsování nastavení sloupců pro prodeje:", e);
+      localStorage.removeItem('salesProductSalesColumnSettings'); // Odstraní poškozená data
+    }
   }
 });
 // --- Handlers for ReusableTable Events ---

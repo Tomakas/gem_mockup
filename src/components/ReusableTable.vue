@@ -7,20 +7,39 @@
         <v-row align="center" class="mb-4">
           <v-col cols="12" sm="6" md="4" class="d-flex align-left">
             <slot name="header-left-content">
-              <v-btn v-if="additionalButton" color="primary" prepend-icon="mdi-plus"
-                @click="$emit('additional-button-click')" class="flex-grow-1">
+              <v-btn
+                v-if="additionalButton"
+                color="primary"
+                prepend-icon="mdi-plus"
+                @click="$emit('additional-button-click')"
+                class="flex-grow-1"
+              >
                 {{ additionalButtonText }}
               </v-btn>
             </slot>
           </v-col>
 
           <v-col cols="12" sm="6" md="8" class="d-flex align-left">
-            <v-text-field v-model="internalSearch" :label="searchLabel" append-inner-icon="mdi-magnify"
-              style="flex-grow: 1"></v-text-field>
-            <v-btn v-if="enableFilters" icon variant="text" @click="filterDialog = true">
+            <v-text-field
+              v-model="internalSearch"
+              :label="searchLabel"
+              append-inner-icon="mdi-magnify"
+              style="flex-grow: 1"
+            ></v-text-field>
+            <v-btn
+              v-if="enableFilters"
+              icon
+              variant="text"
+              @click="filterDialog = true"
+            >
               <v-icon>mdi-filter</v-icon>
             </v-btn>
-            <v-btn v-if="enableColumnSettings" icon variant="text" @click="columnSettingsDialog = true">
+            <v-btn
+              v-if="enableColumnSettings"
+              icon
+              variant="text"
+              @click="columnSettingsDialog = true"
+            >
               <v-icon>mdi-cog</v-icon>
             </v-btn>
           </v-col>
@@ -29,7 +48,6 @@
         <div class="active-filters-container mb-4">
           <slot name="active-filters"></slot>
         </div>
-
 
         <v-dialog v-model="filterDialog" v-if="enableFilters">
           <v-card class="rounded-lg">
@@ -55,7 +73,11 @@
           </v-card>
         </v-dialog>
 
-        <v-dialog v-model="columnSettingsDialog" max-width="400" v-if="enableColumnSettings">
+        <v-dialog
+          v-model="columnSettingsDialog"
+          max-width="400"
+          v-if="enableColumnSettings"
+        >
           <v-card class="rounded-lg">
             <v-card-title class="d-flex justify-space-between align-center">
               <span>{{ columnSettingsDialogTitle }}</span>
@@ -65,22 +87,37 @@
             </v-card-title>
             <v-divider></v-divider>
             <v-card-text class="py-4">
-              <div v-if="currentColumnSettings.length > 0" class="column-settings-container">
+              <div
+                v-if="currentColumnSettings.length > 0"
+                class="column-settings-container"
+              >
                 <p class="text-caption mb-3">
                   Přetáhněte pro změnu pořadí, zaškrtněte pro viditelnost.
                 </p>
 
-                <draggable v-model="currentColumnSettings" item-key="key" handle=".handle" tag="div"
-                  class="draggable-list">
+                <draggable
+                  v-model="currentColumnSettings"
+                  item-key="key"
+                  handle=".handle"
+                  tag="div"
+                  class="draggable-list"
+                >
                   <template #item="{ element }">
-                    <div :class="[
-                      'draggable-item-table-settings',
-                      { 'mandatory-column': element.mandatory } // Přidána nová třída pro povinné
-                    ]">
+                    <div
+                      :class="[
+                        'draggable-item-table-settings',
+                        { 'mandatory-column': element.mandatory }, // Přidána nová třída pro povinné
+                      ]"
+                    >
                       <v-icon class="handle mr-2">mdi-drag-vertical</v-icon>
                       <span class="flex-grow-1">{{ element.title }}</span>
-                      <v-checkbox v-model="element.visible" density="compact" hide-details class="ml-auto"
-                        :disabled="element.mandatory"></v-checkbox>
+                      <v-checkbox
+                        v-model="element.visible"
+                        density="compact"
+                        hide-details
+                        class="ml-auto"
+                        :disabled="element.mandatory"
+                      ></v-checkbox>
                     </div>
                   </template>
                 </draggable>
@@ -101,12 +138,25 @@
           </v-card>
         </v-dialog>
 
-        <v-data-table :headers="visibleAndOrderedHeaders" :items="items" :item-value="itemKey" :search="internalSearch"
-          :items-per-page="internalItemsPerPage" v-model:page="internalPage" :items-length="items.length"
-          :loading="loading" @update:options="handleUpdateOptions"
+        <v-data-table
+          :header-props="{ class: 'font-weight-bold text-center' }"
+          :headers="visibleAndOrderedHeaders"
+          :items="items"
+          :item-value="itemKey"
+          :search="internalSearch"
+          :items-per-page="internalItemsPerPage"
+          v-model:page="internalPage"
+          :items-length="items.length"
+          :loading="loading"
+          @update:options="handleUpdateOptions"
           @click:row="(event, { item }) => $emit('row-click', item)"
-          class="responsive-data-table d-none d-sm-block hover-row">
-          <template v-for="header in visibleAndOrderedHeaders" #[`item.${header.key}`]="{ item }" :key="header.key">
+          class="responsive-data-table d-none d-sm-block hover-row"
+        >
+          <template
+            v-for="header in visibleAndOrderedHeaders"
+            #[`item.${header.key}`]="{ item }"
+            :key="header.key"
+          >
             <td :class="`text-${header.dataAlign || 'start'}`">
               <slot :name="`cell-${header.key}`" :item="item">
                 {{ item[header.key] }}
@@ -116,11 +166,20 @@
 
           <template #bottom>
             <div class="d-flex justify-space-between align-center px-4 py-2">
-              <v-select v-model="internalItemsPerPage" :items="[10, 20, 40, 80]" label="Položek na stránku"
-                style="max-width: 150px"></v-select>
+              <v-select
+                v-model="internalItemsPerPage"
+                :items="[10, 20, 40, 80]"
+                label="Položek na stránku"
+                style="max-width: 150px"
+              ></v-select>
 
-              <v-pagination v-model="internalPage" :length="Math.ceil(items.length / internalItemsPerPage)"
-                :total-visible="5" density="compact" class="d-none d-sm-flex"></v-pagination>
+              <v-pagination
+                v-model="internalPage"
+                :length="Math.ceil(items.length / internalItemsPerPage)"
+                :total-visible="5"
+                density="compact"
+                class="d-none d-sm-flex"
+              ></v-pagination>
 
               <div class="text-caption d-none d-sm-flex">
                 {{ (internalPage - 1) * internalItemsPerPage + 1 }}-{{
@@ -144,14 +203,19 @@
 
                 <v-list-item-subtitle>
                   <div class="text-caption text-medium-emphasis">
-                    <template v-for="header in visibleAndOrderedHeaders" :key="header.key">
-                      <span v-if="
-                        header.key !== mobileTitleKey &&
-                        header.key !== 'actions' &&
-                        !mobileExcludedKeys.includes(header.key) &&
-                        item[header.key] !== null &&
-                        item[header.key] !== undefined
-                      ">
+                    <template
+                      v-for="header in visibleAndOrderedHeaders"
+                      :key="header.key"
+                    >
+                      <span
+                        v-if="
+                          header.key !== mobileTitleKey &&
+                          header.key !== 'actions' &&
+                          !mobileExcludedKeys.includes(header.key) &&
+                          item[header.key] !== null &&
+                          item[header.key] !== undefined
+                        "
+                      >
                         {{ header.title }}:
                         <slot :name="`mobile-cell-${header.key}`" :item="item">
                           {{ item[header.key] }}
@@ -164,12 +228,18 @@
 
                 <template #append>
                   <div class="d-flex flex-column align-end">
-                    <span v-if="isColumnVisible('price')" class="font-weight-bold text-body-1">
+                    <span
+                      v-if="isColumnVisible('price')"
+                      class="font-weight-bold text-body-1"
+                    >
                       <slot name="cell-price" :item="item">
                         {{ item.price }}
                       </slot>
                     </span>
-                    <span v-if="isColumnVisible('tax')" class="text-caption text-medium-emphasis">
+                    <span
+                      v-if="isColumnVisible('tax')"
+                      class="text-caption text-medium-emphasis"
+                    >
                       <slot name="cell-tax" :item="item">
                         Daň: {{ item.tax }} %
                       </slot>
@@ -183,10 +253,20 @@
           </v-list>
 
           <div class="d-flex justify-space-between align-center px-4 py-2 mt-2">
-            <v-select v-model="internalItemsPerPage" :items="[10, 20, 40, 80]" label="Položek na stránku"
-              style="max-width: 150px"></v-select>
+            <v-select
+              v-model="internalItemsPerPage"
+              :items="[10, 20, 40, 80]"
+              label="Položek na stránku"
+              style="max-width: 150px"
+            ></v-select>
             <div class="d-flex align-center">
-              <v-btn icon size="small" variant="text" @click="internalPage--" :disabled="internalPage === 1">
+              <v-btn
+                icon
+                size="small"
+                variant="text"
+                @click="internalPage--"
+                :disabled="internalPage === 1"
+              >
                 <v-icon>mdi-chevron-left</v-icon>
               </v-btn>
               <div class="text-caption mx-2">
@@ -195,56 +275,61 @@
                 }}
                 z {{ items.length }}
               </div>
-              <v-btn icon size="small" variant="text" @click="internalPage++"
-                :disabled="internalPage * internalItemsPerPage >= items.length">
+              <v-btn
+                icon
+                size="small"
+                variant="text"
+                @click="internalPage++"
+                :disabled="internalPage * internalItemsPerPage >= items.length"
+              >
                 <v-icon>mdi-chevron-right</v-icon>
               </v-btn>
             </div>
           </div>
         </div>
-
       </v-card-text>
     </v-card>
   </v-container>
 </template>
 
 <script setup>
-import { ref, computed, watch, watchEffect } from 'vue'; // 
-import draggable from 'vuedraggable'; // 
+import { ref, computed, watch, watchEffect } from "vue"; //
+import draggable from "vuedraggable"; //
 
 const props = defineProps({
   headers: { type: Array, required: true },
   items: { type: Array, required: true },
   itemKey: { type: String, required: true },
-  searchLabel: { type: String, default: 'Hledat' },
+  searchLabel: { type: String, default: "Hledat" },
   enableFilters: { type: Boolean, default: false },
-  filterDialogTitle: { type: String, default: 'Filtry' },
+  filterDialogTitle: { type: String, default: "Filtry" },
   enableColumnSettings: { type: Boolean, default: false },
-  columnSettingsDialogTitle: { type: String, default: 'Nastavení sloupců' },
+  columnSettingsDialogTitle: { type: String, default: "Nastavení sloupců" },
   additionalButton: { type: Boolean, default: false },
-  additionalButtonText: { type: String, default: '' },
+  additionalButtonText: { type: String, default: "" },
   mobileTitleKey: { type: String, required: true },
-  mobileExcludedKeys: { type: Array, default: () => [] }, // 
+  mobileExcludedKeys: { type: Array, default: () => [] }, //
   loading: { type: Boolean, default: false },
 });
-const emit = defineEmits([ // 
-  'row-click',
-  'apply-filters',
-  'clear-filters',
-  'additional-button-click',
-  'update:search',
-  'update:itemsPerPage',
-  'update:page',
-  'load-items',
-  'apply-column-settings',
-  'reset-column-settings'
+const emit = defineEmits([
+  //
+  "row-click",
+  "apply-filters",
+  "clear-filters",
+  "additional-button-click",
+  "update:search",
+  "update:itemsPerPage",
+  "update:page",
+  "load-items",
+  "apply-column-settings",
+  "reset-column-settings",
 ]);
-const internalSearch = ref(''); // 
+const internalSearch = ref(""); //
 const internalPage = ref(1);
 const internalItemsPerPage = ref(10);
 const filterDialog = ref(false);
 const columnSettingsDialog = ref(false);
-const currentColumnSettings = ref([]); // 
+const currentColumnSettings = ref([]); //
 
 // Original column settings are now a computed property based on props.headers
 // This ensures it updates if props.headers change.
@@ -254,21 +339,29 @@ const originalColumnSettings = computed(() =>
     visible: h.visible !== undefined ? h.visible : true,
     key: h.key,
   }))
-); // 
+); //
 
-watch(() => props.headers, () => {
-  // Pokaždé, když se změní hlavičky, resetujeme aktuální nastavení na základě
-  // reaktivní `computed` vlastnosti `originalColumnSettings`.
-  // Používáme deep copy, aby změny v `currentColumnSettings` neovlivnily originál.
-  currentColumnSettings.value = JSON.parse(JSON.stringify(originalColumnSettings.value));
-}, { immediate: true });
+watch(
+  () => props.headers,
+  () => {
+    // Pokaždé, když se změní hlavičky, resetujeme aktuální nastavení na základě
+    // reaktivní `computed` vlastnosti `originalColumnSettings`.
+    // Používáme deep copy, aby změny v `currentColumnSettings` neovlivnily originál.
+    currentColumnSettings.value = JSON.parse(
+      JSON.stringify(originalColumnSettings.value)
+    );
+  },
+  { immediate: true }
+);
 
-const visibleAndOrderedHeaders = computed(() => { // 
+const visibleAndOrderedHeaders = computed(() => {
+  //
   return currentColumnSettings.value.filter((h) => h.visible);
 });
-const isColumnVisible = (key) => { // 
+const isColumnVisible = (key) => {
+  //
   const header = currentColumnSettings.value.find((h) => h.key === key);
-  return header ? header.visible : false; // 
+  return header ? header.visible : false; //
 };
 
 const paginatedMobileItems = computed(() => {
@@ -276,42 +369,52 @@ const paginatedMobileItems = computed(() => {
   const end = start + internalItemsPerPage.value;
   return props.items.slice(start, end);
 });
-watch(internalSearch, (newSearch) => { // 
-  emit('update:search', newSearch);
+watch(internalSearch, (newSearch) => {
+  //
+  emit("update:search", newSearch);
   internalPage.value = 1;
 });
-watch(internalItemsPerPage, (newItemsPerPage) => { // 
-  emit('update:itemsPerPage', newItemsPerPage);
+watch(internalItemsPerPage, (newItemsPerPage) => {
+  //
+  emit("update:itemsPerPage", newItemsPerPage);
   internalPage.value = 1;
 });
-watch(internalPage, (newPage) => { // 
-  emit('update:page', newPage);
-  emit('load-items', {
+watch(internalPage, (newPage) => {
+  //
+  emit("update:page", newPage);
+  emit("load-items", {
     page: newPage,
     itemsPerPage: internalItemsPerPage.value,
     search: internalSearch.value,
   });
 });
-const applyFiltersAndClose = () => { // 
-  emit('apply-filters');
+const applyFiltersAndClose = () => {
+  //
+  emit("apply-filters");
   internalPage.value = 1;
   filterDialog.value = false;
 };
-const clearFiltersAndClose = () => { // 
-  emit('clear-filters');
+const clearFiltersAndClose = () => {
+  //
+  emit("clear-filters");
   internalPage.value = 1;
   filterDialog.value = false;
 };
-const applyColumnSettingsAndClose = () => { // 
-  emit('apply-column-settings', currentColumnSettings.value);
+const applyColumnSettingsAndClose = () => {
+  //
+  emit("apply-column-settings", currentColumnSettings.value);
   columnSettingsDialog.value = false;
 };
-const resetColumnSettings = () => { // 
-  currentColumnSettings.value = JSON.parse(JSON.stringify(originalColumnSettings.value));
-  emit('reset-column-settings');
+const resetColumnSettings = () => {
+  //
+  currentColumnSettings.value = JSON.parse(
+    JSON.stringify(originalColumnSettings.value)
+  );
+  emit("reset-column-settings");
 };
-const handleUpdateOptions = (options) => { // 
-  emit('load-items', options);
+const handleUpdateOptions = (options) => {
+  //
+  emit("load-items", options);
 };
 </script>
 
