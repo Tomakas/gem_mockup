@@ -44,11 +44,10 @@
         </v-row>
       </template>
 
-      <template #cell-name="{ item }">
-        <div class="py-2 text-start">
-          <div class="font-weight-medium">{{ item.name }}</div>
-        </div>
-      </template>
+<template #cell-name="{ item }">
+  <div class="py-2">  <div class="font-weight-medium">{{ item.name }}</div>
+  </div>
+</template>
 
       <template #mobile-title="{ item }">
         {{ item.name }}
