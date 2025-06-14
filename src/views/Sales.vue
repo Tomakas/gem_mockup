@@ -237,10 +237,10 @@ const currentItemsPerPage = ref(10);
 
 // --- Headers for ReusableTable ---
 const originalReceiptHeaders = [
-  { title: 'Datum a čas', key: 'dateTime', align: 'start' },
+  { title: 'Datum a čas', key: 'dateTime', align: 'start', mandatory: true },
   { title: 'Číslo účtenky', key: 'receiptNumber', align: 'start' },
   { title: 'Pokladna', key: 'cashRegister', align: 'start' },
-  { title: 'Částka', key: 'amount', align: 'end' },
+  { title: 'Částka', key: 'amount', align: 'start', mandatory: true },
   { title: 'Typ platby', key: 'paymentType', align: 'start' },
   { title: 'Zákazník', key: 'customer', align: 'start' },
   { title: 'Poznámka', key: 'note', align: 'start' },
@@ -249,19 +249,18 @@ const originalReceiptHeaders = [
 ];
 const originalProductSalesHeaders = [
   { title: 'Účtenka', key: 'receiptNumber', align: 'start' },
-  { title: 'Datum a čas', key: 'dateTime', align: 'start' },
+  { title: 'Datum a čas', key: 'dateTime', align: 'start', mandatory: true },
   { title: 'Položka', key: 'item', align: 'start' },
   { title: 'Cena za položku', key: 'itemPrice', align: 'end' },
   { title: 'Množství', key: 'quantity', align: 'end' },
-  { title: 'Celkem', key: 'total', align: 'end' },
+  { title: 'Celkem', key: 'total', align: 'start', mandatory: true },
   { title: 'DPH', key: 'tax', align: 'end' },
   { title: 'Kategorie', key: 'category', align: 'start' },
   { title: 'Zákazník', key: 'customer', align: 'start' },
 ];
 
-const receiptHeaders = ref(originalReceiptHeaders.map(h => ({ ...h, visible: true, key: h.key })));
-const productSalesHeaders = ref(originalProductSalesHeaders.map(h => ({ ...h, visible: true, key: h.key })));
-// Computed property to select the correct headers based on viewMode
+const receiptHeaders = ref(originalReceiptHeaders);
+const productSalesHeaders = ref(originalProductSalesHeaders);
 const currentHeaders = computed(() => {
   return viewMode.value === 'receipts' ? receiptHeaders.value : productSalesHeaders.value;
 });
@@ -382,10 +381,10 @@ const saveColumnSettings = (newSettings) => {
 };
 const resetColumnSettings = () => {
   if (viewMode.value === 'receipts') {
-    receiptHeaders.value = originalReceiptHeaders.map(h => ({ ...h, visible: true, key: h.key }));
+    receiptHeaders.value = originalReceiptHeaders;
     localStorage.removeItem('salesReceiptColumnSettings');
   } else {
-    productSalesHeaders.value = originalProductSalesHeaders.map(h => ({ ...h, visible: true, key: h.key }));
+    productSalesHeaders.value = originalProductSalesHeaders;
     localStorage.removeItem('salesProductSalesColumnSettings');
   }
 };
