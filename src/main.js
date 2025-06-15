@@ -7,9 +7,18 @@ import "vuetify/styles"; // Import základních stylů Vuetify
 import { createVuetify } from "vuetify";
 import * as components from "vuetify/components";
 import * as directives from "vuetify/directives";
-
 // --- ZMĚNA ZDE: Vložení globálních CSS pravidel přímo do DOM ---
-const customGlobalStyles = ``;
+const customGlobalStyles = `
+  /*
+   * Globální styl pro zalamování VChipGroup.
+   * Cílí na všechny VChipGroup, které mají rodičovskou třídu .chip-group-wrap.
+   * Tím zajistíme, že se štítky (chips) budou správně zalamovat na více řádků.
+   */
+  .chip-group-wrap .v-chip-group__container {
+    flex-wrap: wrap;
+    gap: 8px;
+  }
+`;
 
 const styleElement = document.createElement("style");
 styleElement.type = "text/css";
@@ -79,5 +88,4 @@ const vuetify = createVuetify({
     },
   },
 });
-
 createApp(App).use(router).use(vuetify).mount("#app");
