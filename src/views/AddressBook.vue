@@ -39,6 +39,7 @@
 <script setup>
 import { ref, computed, onMounted } from 'vue';
 import ReusableTable from '/src/components/ReusableTable.vue';
+import customerDataJson from '/src/data/customers.json'; // Import nových dat 
 
 const loading = ref(false);
 const appliedFilters = ref({});
@@ -51,19 +52,26 @@ const customerHeaders = ref([
   { title: 'Role', key: 'role', dataAlign: 'center' },
 ]);
 
-const customers = ref([
-  { id: 1, name: 'Samantha Lee', email: 'samantha.lee@example.com', phone: '+420 777 123 456', role: 'Zákazník' },
-  { id: 2, name: 'Andrew Johnson', email: 'andrew.johnson@example.com', phone: '+420 601 234 567', role: 'Zaměstnanec' },
-  { id: 3, name: 'Michelle Rodriguez', email: 'michelle.rodriguez@example.com', phone: '+420 733 987 654', role: 'Dodavatel' },
-  { id: 4, name: 'Jason Smith', email: 'jason.smith@example.com', phone: '+420 608 111 222', role: 'Zákazník' },
-  { id: 5, name: 'Karen Lee', email: 'karen.lee@example.com', phone: '+420 720 333 444', role: 'Zákazník' },
-]);
+// Načtení dat z importovaného JSON souboru
+const customers = ref([]); 
+const roles = ref([]); // Nová reaktivní proměnná pro role
+
+onMounted(() => {
+  try {
+    customers.value = customerDataJson; // Přiřazení dat z JSON souboru 
+    // Dynamické získání unikátních rolí z dat
+    roles.value = [...new Set(customers.value.map(c => c.role))].sort(); 
+  } catch (error) {
+    console.error('Chyba při načítání dat zákazníků:', error);
+    customers.value = [];
+  }
+});
 
 const addressBookFilterDefinitions = computed(() => [
   {
     key: 'role',
     label: 'Role',
-    items: ['Zákazník', 'Dodavatel', 'Zaměstnanec']
+    items: roles.value // Použití dynamicky získaných rolí
   },
   {
     key: 'phonePrefix',
@@ -96,13 +104,46 @@ const filteredCustomers = computed(() => {
   return filtered;
 });
 
-const handleApplyFilters = (filters) => appliedFilters.value = filters;
-const handleClearFilters = () => appliedFilters.value = {};
-const handleSearchUpdate = (newSearch) => currentSearchTerm.value = newSearch;
+const handleApplyFilters = (filters) => {
+  appliedFilters.value = filters;
+};
 
-const loadItems = () => { /* Pro demo není třeba */ };
-const addNewCustomer = () => { console.log('Přidat nový kontakt'); };
-const saveCustomerColumnSettings = () => { /* Implementovat uložení */ };
-const resetCustomerColumnSettings = () => { /* Implementovat reset */ };
+const handleClearFilters = () => {
+  appliedFilters.value = {};
+};
 
+const handleSearchUpdate = (newSearch) => {
+  currentSearchTerm.value = newSearch;
+};
+
+const loadItems = () => {
+  // Funkce pro načítání položek (pro demo není třeba kompletní implementace)
+  // Zde by mohla být logika pro asynchronní načítání dat např. z API
+  loading.value = true;
+  setTimeout(() => {
+    loading.value = false;
+  }, 300);
+};
+
+const addNewCustomer = () => {
+  console.log('Přidat nový kontakt');
+  // Zde by byla logika pro otevření dialogu/formuláře pro přidání nového kontaktu
+};
+
+const saveCustomerColumnSettings = (newSettings) => {
+  // Uložení nastavení sloupců do localStorage nebo na server
+  console.log('Uložit nastavení sloupců', newSettings);
+  localStorage.setItem('customerColumnSettings', JSON.stringify(newSettings));
+};
+
+const resetCustomerColumnSettings = () => {
+  // Reset nastavení sloupců na výchozí
+  console.log('Resetovat nastavení sloupců');
+  localStorage.removeItem('customerColumnSettings');
+  // Možná budete chtít znovu inicializovat customerHeaders z originalHeaders, pokud existují
+};
 </script>
+
+<style scoped>
+/* Styly specifické pro AddressBook.vue (pokud jsou potřeba) */
+</style>
