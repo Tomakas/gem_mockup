@@ -71,61 +71,30 @@
               <div v-for="(def, index) in filterDefinitions" :key="def.key">
                 <div class="text-subtitle-1 mb-2">{{ def.label }}</div>
 
-                <v-chip-group v-if="def.type === 'multiselect-chips'" v-model="filterValues[def.key]" multiple class="chip-group-wrap mb-4">
+                <v-chip-group v-if="def.items" v-model="filterValues[def.key]" multiple class="chip-group-wrap mb-4">
                   <v-chip v-for="item in def.items" :key="item" :value="item" filter>
                     {{ def.itemText ? item[def.itemText] : item }} {{ def.suffix || '' }}
                   </v-chip>
                 </v-chip-group>
 
-                <v-select
-                  v-if="def.type === 'select'"
-                  v-model="filterValues[def.key]"
-                  :items="def.items"
-                  :label="def.label"
-                  clearable
-                  class="mb-4"
-                ></v-select>
-
-                <v-text-field
-                  v-if="def.type === 'text'"
-                  v-model="filterValues[def.key]"
-                  :label="def.label"
-                  clearable
-                  class="mb-4"
-                ></v-text-field>
-
-                <v-row v-if="def.type === 'range'" class="mb-4">
+                <v-row v-else-if="def.type === 'range'" class="mb-4">
                   <v-col cols="12" sm="6">
-                    <v-text-field
-                      v-model.number="filterValues[def.key].min"
-                      :label="`${def.label} od`"
-                      type="number"
-                      :prefix="def.prefix || ''"
-                      clearable
-                    ></v-text-field>
+                    <v-text-field v-model.number="filterValues[def.key].min" :label="`${def.label} od`" type="number" :prefix="def.prefix || ''" clearable></v-text-field>
                   </v-col>
                   <v-col cols="12" sm="6">
-                    <v-text-field
-                      v-model.number="filterValues[def.key].max"
-                      :label="`${def.label} do`"
-                      type="number"
-                      :prefix="def.prefix || ''"
-                      clearable
-                    ></v-text-field>
+                    <v-text-field v-model.number="filterValues[def.key].max" :label="`${def.label} do`" type="number" :prefix="def.prefix || ''" clearable></v-text-field>
                   </v-col>
                 </v-row>
+                
+                 <v-text-field v-else-if="def.type === 'text'" v-model="filterValues[def.key]" :label="def.label" clearable class="mb-4"></v-text-field>
 
                 <v-divider v-if="index < filterDefinitions.length - 1" class="my-4"></v-divider>
               </div>
             </v-card-text>
             <v-divider></v-divider>
             <v-card-actions class="d-flex justify-end pa-4">
-              <v-btn variant="text" @click="clearFiltersAndClose">
-                Vyčistit filtry
-              </v-btn>
-              <v-btn color="primary" @click="applyFiltersAndClose">
-                Filtrovat
-              </v-btn>
+              <v-btn variant="text" @click="clearFiltersAndClose">Vyčistit filtry</v-btn>
+              <v-btn color="primary" @click="applyFiltersAndClose">Filtrovat</v-btn>
             </v-card-actions>
           </v-card>
         </v-dialog>
@@ -260,10 +229,7 @@
 
                 <v-list-item-subtitle>
                   <div class="text-caption text-medium-emphasis">
-                    <template
-                      v-for="header in visibleAndOrderedHeaders"
-                      :key="header.key"
-                    >
+                    <template v-for="header in visibleAndOrderedHeaders" :key="header.key">
                       <span
                         v-if="
                           header.key !== mobileTitleKey &&
@@ -284,25 +250,20 @@
                 </v-list-item-subtitle>
 
                 <template #append>
-                  <div class="d-flex flex-column align-end">
-                    <span
-                      v-if="isColumnVisible('price')"
-                      class="font-weight-bold text-body-1"
-                    >
-                      <slot name="cell-price" :item="item">
-                        {{ item.price }}
-                      </slot>
-                    </span>
-                    <span
-                      v-if="isColumnVisible('tax')"
-                      class="text-caption text-medium-emphasis"
-                    >
-                      <slot name="cell-tax" :item="item">
-                        Daň: {{ item.tax }} %
-                      </slot>
-                    </span>
-                    <slot name="mobile-append-content" :item="item"></slot>
-                  </div>
+                  <slot name="mobile-append" :item="item" :isColumnVisible="isColumnVisible">
+                    <div class="d-flex flex-column align-end">
+                      <span v-if="isColumnVisible('price')" class="font-weight-bold text-body-1">
+                        <slot name="cell-price" :item="item">
+                          {{ item.price }}
+                        </slot>
+                      </span>
+                      <span v-if="isColumnVisible('tax')" class="text-caption text-medium-emphasis">
+                        <slot name="cell-tax" :item="item">
+                          Daň: {{ item.tax }} %
+                        </slot>
+                      </span>
+                    </div>
+                  </slot>
                 </template>
               </v-list-item>
               <v-divider></v-divider>
@@ -371,16 +332,9 @@ const props = defineProps({
 });
 
 const emit = defineEmits([
-  "row-click",
-  "apply-filters",
-  "clear-filters",
-  "additional-button-click",
-  "update:search",
-  "update:itemsPerPage",
-  "update:page",
-  "load-items",
-  "apply-column-settings",
-  "reset-column-settings",
+  "row-click", "apply-filters", "clear-filters", "additional-button-click",
+  "update:search", "update:itemsPerPage", "update:page", "load-items",
+  "apply-column-settings", "reset-column-settings",
 ]);
 
 const internalSearch = ref("");
@@ -394,10 +348,10 @@ const filterValues = ref({});
 const initializeFilterValues = () => {
   const newValues = {};
   props.filterDefinitions.forEach(def => {
-    if (def.type === 'range') {
-      newValues[def.key] = { min: null, max: null };
-    } else if (def.type === 'multiselect-chips') {
+    if (def.items) {
       newValues[def.key] = [];
+    } else if (def.type === 'range') {
+      newValues[def.key] = { min: null, max: null };
     } else {
       newValues[def.key] = null;
     }
@@ -437,11 +391,10 @@ const activeFiltersDisplay = computed(() => {
 
     const value = filterValues.value[key];
 
-    if (definition.type === 'multiselect-chips' && value.length > 0) {
+    if (definition.items && Array.isArray(value) && value.length > 0) {
       value.forEach(v => {
         filters.push({
           key,
-          type: definition.type,
           label: definition.label,
           value: v,
           displayValue: `${v} ${definition.suffix || ''}`.trim(),
@@ -450,9 +403,7 @@ const activeFiltersDisplay = computed(() => {
     } else if (definition.type === 'range') {
       if (value.min) {
         filters.push({
-          key,
-          subKey: 'min',
-          type: definition.type,
+          key, subKey: 'min',
           label: `${definition.label} od`,
           value: value.min,
           displayValue: `${definition.prefix || ''}${value.min}`
@@ -460,18 +411,15 @@ const activeFiltersDisplay = computed(() => {
       }
       if (value.max) {
         filters.push({
-          key,
-          subKey: 'max',
-          type: definition.type,
+          key, subKey: 'max',
           label: `${definition.label} do`,
           value: value.max,
           displayValue: `${definition.prefix || ''}${value.max}`
         });
       }
-    } else if (value) {
+    } else if (definition.type === 'text' && value) {
         filters.push({
           key,
-          type: definition.type,
           label: definition.label,
           value: value,
           displayValue: value
@@ -482,16 +430,15 @@ const activeFiltersDisplay = computed(() => {
 });
 
 const removeFilter = (filter) => {
-  if (filter.type === 'multiselect-chips') {
+  if (Array.isArray(filterValues.value[filter.key])) {
     filterValues.value[filter.key] = filterValues.value[filter.key].filter(v => v !== filter.value);
-  } else if (filter.type === 'range') {
+  } else if (filter.subKey) { // Pro range
     filterValues.value[filter.key][filter.subKey] = null;
   } else {
     filterValues.value[filter.key] = null;
   }
   emit("apply-filters", filterValues.value);
 };
-
 
 const visibleAndOrderedHeaders = computed(() => {
   return currentColumnSettings.value.filter((h) => h.visible);
@@ -562,33 +509,24 @@ const handleUpdateOptions = (options) => {
   max-height: 400px;
   overflow-y: auto;
 }
-
 .draggable-list {
   list-style-type: none;
   padding: 0;
 }
-
 .draggable-item-table-settings {
   display: flex;
   align-items: center;
   padding: 8px;
   background-color: rgb(var(--v-theme-surface-variant));
-  border: 1px solid rgb(var(--v-theme-on-surface), 0.1);
+  border: 1px solid rgba(var(--v-theme-on-surface), 0.1);
   margin-bottom: 4px;
   border-radius: 4px;
 }
-
 .draggable-item-table-settings .handle {
   cursor: grab;
   margin-right: 8px;
 }
-
 .hover-row :deep(tbody tr:hover) {
   cursor: pointer;
-}
-
-.chip-group-wrap :deep(.v-chip-group__container) {
-  flex-wrap: wrap;
-  gap: 8px;
 }
 </style>

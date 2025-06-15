@@ -7,9 +7,7 @@
       searchLabel="Hledat produkt"
       :enableFilters="true"
       filterDialogTitle="Filtry produktů"
-      
       :filter-definitions="productFilterDefinitions"
-
       :enableColumnSettings="true"
       columnSettingsDialogTitle="Nastavení sloupců produktů"
       :loading="loading"
@@ -21,10 +19,8 @@
       @row-click="openProductDetail"
       @apply-column-settings="saveProductColumnSettings"
       @reset-column-settings="resetProductColumnSettings"
-
       @apply-filters="handleApplyFilters"
       @clear-filters="handleClearFilters"
-      
       @update:search="handleSearchUpdate"
       @update:itemsPerPage="handleItemsPerPageUpdate"
       @update:page="handlePageUpdate"
@@ -60,13 +56,10 @@ import ProductDetail from '@/components/ProductDetail.vue';
 import ReusableTable from '/src/components/ReusableTable.vue';
 
 const loading = ref(false);
-
-// ZMĚNA: Lokální stav pro filtry byl odstraněn.
-// Místo něj máme stav pro aplikované filtry, který se plní z události.
 const appliedFilters = ref({});
-
 const productDetailDialog = ref(false);
 const selectedProduct = ref(null);
+
 const originalHeaders = [
   { title: 'Název produktu', key: 'productName', dataAlign: 'end', mandatory: true },
   { title: 'Kategorie', key: 'category', dataAlign: 'end' },
@@ -81,18 +74,15 @@ const products = ref([]);
 const categories = ref([]);
 const taxes = ref([]);
 
-// ZMĚNA: Definice filtrů pro produkty, které se předají do ReusableTable
 const productFilterDefinitions = computed(() => [
   { 
     key: 'category', 
     label: 'Kategorie', 
-    type: 'multiselect-chips', 
-    items: categories.value 
+    items: categories.value
   },
   { 
     key: 'tax', 
     label: 'Daň', 
-    type: 'multiselect-chips', 
     items: taxes.value,
     suffix: '%'
   },
@@ -103,7 +93,6 @@ const productFilterDefinitions = computed(() => [
     prefix: 'Kč'
   }
 ]);
-
 
 const currentSearchTerm = ref('');
 const currentPage = ref(1);
@@ -132,11 +121,10 @@ const filteredProducts = computed(() => {
     );
   }
 
-  // ZMĚNA: Logika filtrace nyní používá objekt `appliedFilters`
-  if (appliedFilters.value.category && appliedFilters.value.category.length > 0) {
+  if (appliedFilters.value.category?.length > 0) {
     filtered = filtered.filter((product) => appliedFilters.value.category.includes(product.category));
   }
-  if (appliedFilters.value.tax && appliedFilters.value.tax.length > 0) {
+  if (appliedFilters.value.tax?.length > 0) {
     filtered = filtered.filter((product) => appliedFilters.value.tax.includes(product.tax));
   }
   if (appliedFilters.value.price?.min) {
@@ -156,31 +144,26 @@ const formatCurrency = (value) => {
 const handleSearchUpdate = (newSearch) => { currentSearchTerm.value = newSearch; };
 const handleItemsPerPageUpdate = (newItemsPerPage) => { currentItemsPerPage.value = newItemsPerPage; };
 const handlePageUpdate = (newPage) => { currentPage.value = newPage; };
-const loadItems = (options) => {
+const loadItems = () => {
   loading.value = true;
   setTimeout(() => { loading.value = false; }, 300);
 };
+
+const handleApplyFilters = (filters) => {
+  appliedFilters.value = filters;
+};
+const handleClearFilters = () => {
+  appliedFilters.value = {};
+};
+
 const addNewProduct = () => {
   selectedProduct.value = {};
   productDetailDialog.value = true;
 };
-
-// ZMĚNA: Nové funkce pro zpracování událostí
-const handleApplyFilters = (filters) => {
-  console.log('Aplikuji filtry v Products.vue:', filters);
-  appliedFilters.value = filters;
-};
-const handleClearFilters = () => {
-  console.log('Čistím filtry v Products.vue');
-  appliedFilters.value = {};
-};
-
-
 const openProductDetail = (item) => {
   selectedProduct.value = item;
   productDetailDialog.value = true;
 };
-
 const saveProduct = (updatedProduct) => {
   const index = products.value.findIndex((p) => p.id === updatedProduct.id);
   if (index !== -1) {
@@ -200,12 +183,11 @@ const duplicateProduct = (item) => {
   selectedProduct.value = duplicated;
   productDetailDialog.value = true;
 };
-
 const viewSales = (item) => { console.log(`Zobrazit prodeje pro produkt: ${item.productName}`); };
 const saveProductColumnSettings = (newSettings) => { localStorage.setItem('productColumnSettings', JSON.stringify(newSettings)); };
 const resetProductColumnSettings = () => { localStorage.removeItem('productColumnSettings'); };
 </script>
 
 <style scoped>
-/* Zde nejsou potřeba žádné specifické styly */
+/* Tento soubor nepotřebuje žádné specifické styly */
 </style>
