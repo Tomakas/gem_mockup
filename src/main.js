@@ -8,17 +8,7 @@ import { createVuetify } from "vuetify";
 import * as components from "vuetify/components";
 import * as directives from "vuetify/directives";
 // --- ZMĚNA ZDE: Vložení globálních CSS pravidel přímo do DOM ---
-const customGlobalStyles = `
-  /*
-   * Globální styl pro zalamování VChipGroup.
-   * Cílí na všechny VChipGroup, které mají rodičovskou třídu .chip-group-wrap.
-   * Tím zajistíme, že se štítky (chips) budou správně zalamovat na více řádků.
-   */
-  .chip-group-wrap .v-chip-group__container {
-    flex-wrap: wrap;
-    gap: 8px;
-  }
-`;
+const customGlobalStyles = ``;
 
 const styleElement = document.createElement("style");
 styleElement.type = "text/css";
@@ -39,7 +29,7 @@ const vuetify = createVuetify({
           accent: "#82B1FF",
           error: "#FF5252",
           info: "#2196F3",
-          success: "#4CAF50",
+         success: "#4CAF50",
           warning: "#FB8C00",
         },
       },
@@ -49,7 +39,7 @@ const vuetify = createVuetify({
           secondary: "#424242",
           accent: "#BB86FC",
           error: "#CF6679",
-          info: "#2196F3",
+         info: "#2196F3",
           success: "#4CAF50",
           warning: "#FB8C00",
         },
@@ -65,7 +55,7 @@ const vuetify = createVuetify({
       fluid: true,
       class: "pa-0 pa-sm-1 pa-md-4",
     },
-    VTextField: {
+   VTextField: {
       variant: "outlined",
       density: "compact",
       hideDetails: true,
@@ -81,7 +71,7 @@ const vuetify = createVuetify({
     },
     VDataTable: {
       class: "elevation-0 mt-4",
-      itemsPerPage: 10,
+     itemsPerPage: 10,
     },
     VList: {
       dense: true,

@@ -291,4 +291,8 @@ const resetProductColumnSettings = () => { localStorage.removeItem('productColum
 </script>
 
 <style scoped>
+.chip-group-wrap .v-chip-group__container {
+  flex-wrap: wrap;
+  gap: 8px;
+}
 </style>
