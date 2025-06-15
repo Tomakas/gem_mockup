@@ -121,7 +121,8 @@
         <v-divider></v-divider>
         <v-card-text class="py-4">
             <p>Celkový součet: {{ formatCurrency(totalSales) }}</p>
-            <p>Počet účtenek: {{ totalReceiptsCount }}</p>
+            <p>Počet zobrazených položek: {{ filteredAndSearchedItems.length }}</p>
+            <p v-if="viewMode === 'receipts'">Počet unikátních účtenek: {{ totalReceiptsCount }}</p>
         </v-card-text>
         <v-divider></v-divider>
         <v-card-actions class="d-flex justify-end pa-4">
@@ -137,6 +138,7 @@ import { ref, computed, watch } from 'vue';
 import receiptsDataRaw from '/src/data/receipts.json';
 import salesDataRaw from '/src/data/sales.json';
 import ReusableTable from '/src/components/ReusableTable.vue';
+import { formatCurrency } from '@/utils/formatters.js'; // <-- NOVÝ IMPORT
 
 const loading = ref(false);
 const viewMode = ref('receipts');
@@ -145,10 +147,12 @@ const statsDialog = ref(false);
 
 const receiptsData = ref(receiptsDataRaw);
 const salesData = ref(salesDataRaw.filter(s => s.item));
+
 const paymentTypes = computed(() => [...new Set(receiptsData.value.map(r => r.paymentType).filter(Boolean))]);
 const users = computed(() => [...new Set(receiptsData.value.map(r => r.user).filter(Boolean))]);
 const productCategories = computed(() => [...new Set(salesData.value.map(s => s.category).filter(Boolean))]);
 const salesTaxes = computed(() => [...new Set(salesData.value.map(s => s.tax))].sort((a, b) => a - b));
+
 const receiptFilterDefinitions = computed(() => [
   { key: 'paymentType', label: 'Typ platby', items: paymentTypes.value },
   { key: 'user', label: 'Uživatel', items: users.value },
@@ -161,14 +165,16 @@ const receiptFilterDefinitions = computed(() => [
   },
   { key: 'amount', label: 'Částka', type: 'range', prefix: 'Kč' },
 ]);
+
 const productSalesFilterDefinitions = computed(() => [
   { key: 'category', label: 'Kategorie', items: productCategories.value },
   { key: 'tax', label: 'DPH', items: salesTaxes.value, suffix: '%' },
   { key: 'itemPrice', label: 'Cena za položku', type: 'range', prefix: 'Kč' },
   { key: 'quantity', label: 'Množství', type: 'range' },
-  { key: 'customer', label: 'Zákazník (prodej)', type: 'text' }, // Filtr pro zákazníka v prodejích
-  { key: 'receiptNumber', label: 'Číslo účtenky (prodej)', type: 'text' }, // Filtr pro číslo účtenky v prodejích
+  { key: 'customer', label: 'Zákazník (prodej)', type: 'text' },
+  { key: 'receiptNumber', label: 'Číslo účtenky (prodej)', type: 'text' },
 ]);
+
 const currentFilterDefinitions = computed(() => {
   return viewMode.value === 'receipts' ? receiptFilterDefinitions.value : productSalesFilterDefinitions.value;
 });
@@ -187,25 +193,70 @@ const originalReceiptHeaders = [
   { title: 'Vytištěno', key: 'printed', align: 'center' },
   { title: 'Uživatel', key: 'user', align: 'start' },
 ];
+
 const originalProductSalesHeaders = [
   { title: 'Datum a čas', key: 'dateTime', align: 'start', mandatory: true },
   { title: 'Položka', key: 'item', align: 'start', mandatory: true },
-  { title: 'Číslo účtenky', key: 'receiptNumber', align: 'start' }, // Přidáno
-  { title: 'Cena za položku', key: 'itemPrice', align: 'end' }, // Přidáno
-  { title: 'Množství', key: 'quantity', align: 'end' }, // Přidáno
+  { title: 'Číslo účtenky', key: 'receiptNumber', align: 'start' },
+  { title: 'Cena za položku', key: 'itemPrice', align: 'end' },
+  { title: 'Množství', key: 'quantity', align: 'end' },
   { title: 'Celkem', key: 'total', align: 'end', mandatory: true },
   { title: 'Kategorie', key: 'category', align: 'start' },
   { title: 'DPH', key: 'tax', align: 'end' },
-  { title: 'Zákazník', key: 'customer', align: 'start' }, // Přidáno
+  { title: 'Zákazník', key: 'customer', align: 'start' },
 ];
+
 const receiptHeaders = ref(originalReceiptHeaders);
 const productSalesHeaders = ref(originalProductSalesHeaders);
-
 const currentHeaders = computed(() => {
   return viewMode.value === 'receipts' ? receiptHeaders.value : productSalesHeaders.value;
 });
+
+// REFAKTORIZACE - ČÁST 1: Logika filtrování pro účtenky
+const filteredReceipts = computed(() => {
+  let items = receiptsData.value;
+  if (appliedFilters.value.paymentType?.length) items = items.filter(i => appliedFilters.value.paymentType.includes(i.paymentType));
+  if (appliedFilters.value.user?.length) items = items.filter(i => appliedFilters.value.user.includes(i.user));
+  if (appliedFilters.value.amount?.min) items = items.filter(i => i.amount >= appliedFilters.value.amount.min);
+  if (appliedFilters.value.amount?.max) items = items.filter(i => i.amount <= appliedFilters.value.amount.max);
+  if (appliedFilters.value.customer) {
+    const customerSearch = appliedFilters.value.customer.toLowerCase();
+    items = items.filter(i => i.customer && i.customer.toLowerCase().includes(customerSearch));
+  }
+  if (appliedFilters.value.note) {
+    const noteSearch = appliedFilters.value.note.toLowerCase();
+    items = items.filter(i => i.note && i.note.toLowerCase().includes(noteSearch));
+  }
+  if ('printed' in appliedFilters.value && appliedFilters.value.printed.length > 0) {
+      const printedValues = appliedFilters.value.printed.map(p => p.value);
+      items = items.filter(i => printedValues.includes(i.printed));
+  }
+  return items;
+});
+
+// REFAKTORIZACE - ČÁST 2: Logika filtrování pro prodeje produktů
+const filteredProductSales = computed(() => {
+  let items = salesData.value;
+  if (appliedFilters.value.category?.length) items = items.filter(i => appliedFilters.value.category.includes(i.category));
+  if (appliedFilters.value.tax?.length) items = items.filter(i => appliedFilters.value.tax.includes(i.tax));
+  if (appliedFilters.value.itemPrice?.min) items = items.filter(i => i.itemPrice >= appliedFilters.value.itemPrice.min);
+  if (appliedFilters.value.itemPrice?.max) items = items.filter(i => i.itemPrice <= appliedFilters.value.itemPrice.max);
+  if (appliedFilters.value.quantity?.min) items = items.filter(i => i.quantity >= appliedFilters.value.quantity.min);
+  if (appliedFilters.value.quantity?.max) items = items.filter(i => i.quantity <= appliedFilters.value.quantity.max);
+  if (appliedFilters.value.customer) {
+    const customerSearch = appliedFilters.value.customer.toLowerCase();
+    items = items.filter(i => i.customer && i.customer.toLowerCase().includes(customerSearch));
+  }
+  if (appliedFilters.value.receiptNumber) {
+    const receiptNumberSearch = appliedFilters.value.receiptNumber.toLowerCase();
+    items = items.filter(i => i.receiptNumber && i.receiptNumber.toLowerCase().includes(receiptNumberSearch));
+  }
+  return items;
+});
+
+// REFAKTORIZACE - ČÁST 3: Hlavní property nyní jen přepíná a vyhledává
 const filteredAndSearchedItems = computed(() => {
-  let items = viewMode.value === 'receipts' ? receiptsData.value : salesData.value;
+  let items = viewMode.value === 'receipts' ? filteredReceipts.value : filteredProductSales.value;
 
   if (currentSearchTerm.value) {
     const searchTerm = currentSearchTerm.value.toLowerCase();
@@ -215,51 +266,21 @@ const filteredAndSearchedItems = computed(() => {
       )
     );
   }
-
-  if (viewMode.value === 'receipts') {
-    if (appliedFilters.value.paymentType?.length) items = items.filter(i => appliedFilters.value.paymentType.includes(i.paymentType));
-    if (appliedFilters.value.user?.length) items = items.filter(i => appliedFilters.value.user.includes(i.user));
-    if (appliedFilters.value.amount?.min) items = items.filter(i => i.amount >= appliedFilters.value.amount.min);
-    if (appliedFilters.value.amount?.max) items = items.filter(i => i.amount <= appliedFilters.value.amount.max);
-    if (appliedFilters.value.customer) {
-      const customerSearch = appliedFilters.value.customer.toLowerCase();
-      items = items.filter(i => i.customer && i.customer.toLowerCase().includes(customerSearch));
-    }
-    if (appliedFilters.value.note) {
-      const noteSearch = appliedFilters.value.note.toLowerCase();
-      items = items.filter(i => i.note && i.note.toLowerCase().includes(noteSearch));
-    }
-    if (appliedFilters.value.printed !== undefined && appliedFilters.value.printed !== null) {
-      items = items.filter(i => i.printed === appliedFilters.value.printed);
-    }
-
-  } else { // Prodej produktů
-    if (appliedFilters.value.category?.length) items = items.filter(i => appliedFilters.value.category.includes(i.category));
-    if (appliedFilters.value.tax?.length) items = items.filter(i => appliedFilters.value.tax.includes(i.tax));
-    if (appliedFilters.value.itemPrice?.min) items = items.filter(i => i.itemPrice >= appliedFilters.value.itemPrice.min);
-    if (appliedFilters.value.itemPrice?.max) items = items.filter(i => i.itemPrice <= appliedFilters.value.itemPrice.max);
-    if (appliedFilters.value.quantity?.min) items = items.filter(i => i.quantity >= appliedFilters.value.quantity.min);
-    if (appliedFilters.value.quantity?.max) items = items.filter(i => i.quantity <= appliedFilters.value.quantity.max);
-    // Nové filtry pro prodeje produktů
-    if (appliedFilters.value.customer) {
-      const customerSearch = appliedFilters.value.customer.toLowerCase();
-      items = items.filter(i => i.customer && i.customer.toLowerCase().includes(customerSearch));
-    }
-    if (appliedFilters.value.receiptNumber) {
-      const receiptNumberSearch = appliedFilters.value.receiptNumber.toLowerCase();
-      items = items.filter(i => i.receiptNumber && i.receiptNumber.toLowerCase().includes(receiptNumberSearch));
-    }
-  }
-
   return items;
 });
+
+
 const totalSales = computed(() => filteredAndSearchedItems.value.reduce((sum, item) => sum + (item.amount || item.total || 0), 0));
-const totalReceiptsCount = computed(() => new Set(filteredAndSearchedItems.value.map(i => i.receiptNumber)).size);
+const totalReceiptsCount = computed(() => {
+    if (viewMode.value !== 'receipts') return 0;
+    return new Set(filteredAndSearchedItems.value.map(i => i.receiptNumber)).size
+});
 
 watch(viewMode, () => {
   currentSearchTerm.value = '';
   handleClearFilters();
 });
+
 const handleApplyFilters = (filters) => appliedFilters.value = filters;
 const handleClearFilters = () => appliedFilters.value = {};
 const handleSearchUpdate = (newSearch) => currentSearchTerm.value = newSearch;
@@ -269,6 +290,5 @@ const handlePageUpdate = (newPage) => currentPage.value = newPage;
 const loadItems = () => { /* V demo verzi není potřeba */ };
 const saveColumnSettings = () => { /* Implementace uložení do localStorage */ };
 const resetColumnSettings = () => { /* Implementace resetu */ };
-const formatCurrency = (value) => new Intl.NumberFormat('cs-CZ', { style: 'currency', currency: 'CZK' }).format(value || 0);
 const formatDateTime = (date) => date ? new Date(date).toLocaleString('cs-CZ', { year: '2-digit', month: '2-digit', day: '2-digit', hour: '2-digit', minute: '2-digit' }) : '-';
 </script>

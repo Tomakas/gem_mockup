@@ -9,14 +9,12 @@
             <v-text-field
               v-model="editableProduct.productName"
               label="Název produktu"
-              variant="outlined"
             ></v-text-field>
           </v-col>
           <v-col cols="12" sm="6">
             <v-text-field
               :model-value="editableProduct.id"
               label="ID"
-              variant="outlined"
               readonly
             ></v-text-field>
           </v-col>
@@ -25,7 +23,6 @@
               v-model="editableProduct.category"
               :items="categories"
               label="Kategorie"
-              variant="outlined"
             ></v-select>
           </v-col>
           <v-col cols="12" sm="6">
@@ -34,7 +31,6 @@
               label="Cena"
               type="number"
               prefix="Kč"
-              variant="outlined"
             ></v-text-field>
           </v-col>
           <v-col cols="12" sm="6">
@@ -42,7 +38,6 @@
               v-model.number="editableProduct.tax"
               :items="taxes"
               label="Daň"
-              variant="outlined"
             ></v-select>
           </v-col>
           
@@ -50,21 +45,18 @@
             <v-text-field
               v-model="editableProduct.Dodavatel"
               label="Dodavatel"
-              variant="outlined"
             ></v-text-field>
           </v-col>
           <v-col cols="12" sm="6" v-if="editableProduct.Barva !== undefined">
             <v-text-field
               v-model="editableProduct.Barva"
               label="Barva"
-              variant="outlined"
             ></v-text-field>
           </v-col>
           <v-col cols="12" sm="6" v-if="editableProduct.SKU !== undefined">
             <v-text-field
               v-model="editableProduct.SKU"
               label="SKU"
-              variant="outlined"
             ></v-text-field>
           </v-col>
           
@@ -72,8 +64,8 @@
             <v-textarea
               v-model="editableProduct.Poznámka"
               label="Poznámka"
-              variant="outlined"
               rows="2"
+              variant="outlined"
             ></v-textarea>
           </v-col>
         </v-row>
@@ -97,7 +89,8 @@
 </template>
 
 <script setup>
-import { ref, watch, computed } from 'vue';
+import { ref, watch } from 'vue';
+// Žádné další importy zde nejsou potřeba, protože formátovací funkce se v <template> této komponenty nepoužívá.
 
 const props = defineProps({
   modelValue: {
@@ -109,21 +102,18 @@ const props = defineProps({
     default: null,
   },
 });
-
 const emit = defineEmits(['update:modelValue', 'saveProduct', 'deleteProduct', 'duplicateProduct', 'viewSales']);
 
 const dialog = ref(props.modelValue);
 const editableProduct = ref(null);
-
-const categories = ref(['Elektronika', 'Domácnost', 'Sport', 'Oblečení', 'Jídlo']);
+const categories = ref(['Elektronika', 'Domácnost', 'Sport', 'Oblečení', 'Jídlo', 'Knihy', 'Hračky', 'Kosmetika']); // Rozšířeno pro plnou kompatibilitu
 const taxes = ref([10, 15, 21]);
 
 watch(() => props.product, (newProduct) => {
   if (newProduct) {
-    editableProduct.value = { 
-      ...newProduct,
-      Poznámka: newProduct.Poznámka !== undefined ? newProduct.Poznámka : newProduct.description
-    };
+    // Zjednodušená logika: Klonujeme objekt pro editaci.
+    // Původní fallback na 'description' byl odstraněn jako nadbytečný.
+    editableProduct.value = { ...newProduct };
   } else {
     editableProduct.value = null;
   }
@@ -139,13 +129,6 @@ watch(dialog, (newValue) => {
 
 const closeDialog = () => {
   dialog.value = false;
-};
-
-const formatCurrency = (value) => {
-  if (value === null || value === undefined) {
-    return 'Není k dispozici';
-  }
-  return new Intl.NumberFormat('cs-CZ', { style: 'currency', currency: 'CZK' }).format(value);
 };
 
 const saveChanges = () => {
