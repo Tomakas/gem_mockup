@@ -72,8 +72,8 @@
                 <div class="text-subtitle-1 mb-2">{{ def.label }}</div>
 
                 <v-chip-group v-if="def.items" v-model="filterValues[def.key]" multiple class="chip-group-wrap mb-4">
-                  <v-chip v-for="item in def.items" :key="item" :value="item" filter>
-                    {{ def.itemText ? item[def.itemText] : item }} {{ def.suffix || '' }}
+                  <v-chip v-for="item in def.items" :key="typeof item === 'object' ? item.value : item" :value="typeof item === 'object' ? item.value : item" filter>
+                    {{ typeof item === 'object' ? item.text : def.itemText ? item[def.itemText] : item }} {{ def.suffix || '' }}
                   </v-chip>
                 </v-chip-group>
 
@@ -85,8 +85,8 @@
                     <v-text-field v-model.number="filterValues[def.key].max" :label="`${def.label} do`" type="number" :prefix="def.prefix || ''" clearable></v-text-field>
                   </v-col>
                 </v-row>
-                
-                 <v-text-field v-else-if="def.type === 'text'" v-model="filterValues[def.key]" :label="def.label" clearable class="mb-4"></v-text-field>
+
+                <v-text-field v-else-if="def.type === 'text'" v-model="filterValues[def.key]" :label="def.label" clearable class="mb-4"></v-text-field>
 
                 <v-divider v-if="index < filterDefinitions.length - 1" class="my-4"></v-divider>
               </div>
@@ -312,42 +312,40 @@
 
 <script setup>
 import { ref, computed, watch } from "vue";
-import draggable from "vuedraggable";
+import draggable from "vuedraggable"; // 
 
 const props = defineProps({
   headers: { type: Array, required: true },
   items: { type: Array, required: true },
   itemKey: { type: String, required: true },
-  searchLabel: { type: String, default: "Hledat" },
-  enableFilters: { type: Boolean, default: false },
-  filterDialogTitle: { type: String, default: "Filtry" },
-  filterDefinitions: { type: Array, default: () => [] },
-  enableColumnSettings: { type: Boolean, default: false },
-  columnSettingsDialogTitle: { type: String, default: "Nastavení sloupců" },
-  additionalButton: { type: Boolean, default: false },
-  additionalButtonText: { type: String, default: "" },
-  mobileTitleKey: { type: String, required: true },
-  mobileExcludedKeys: { type: Array, default: () => [] },
-  loading: { type: Boolean, default: false },
+  searchLabel: { type: String, default: "Hledat" }, // 
+  enableFilters: { type: Boolean, default: false }, // 
+  filterDialogTitle: { type: String, default: "Filtry" }, // 
+  filterDefinitions: { type: Array, default: () => [] }, // 
+  enableColumnSettings: { type: Boolean, default: false }, // 
+  columnSettingsDialogTitle: { type: String, default: "Nastavení sloupců" }, // 
+  additionalButton: { type: Boolean, default: false }, // 
+  additionalButtonText: { type: String, default: "" }, // 
+  mobileTitleKey: { type: String, required: true }, // 
+  mobileExcludedKeys: { type: Array, default: () => [] }, // 
+  loading: { type: Boolean, default: false }, // 
 });
-
 const emit = defineEmits([
-  "row-click", "apply-filters", "clear-filters", "additional-button-click",
-  "update:search", "update:itemsPerPage", "update:page", "load-items",
-  "apply-column-settings", "reset-column-settings",
+  "row-click", "apply-filters", "clear-filters", "additional-button-click", // 
+  "update:search", "update:itemsPerPage", "update:page", "load-items", // 
+  "apply-column-settings", "reset-column-settings", // 
 ]);
-
-const internalSearch = ref("");
-const internalPage = ref(1);
-const internalItemsPerPage = ref(10);
-const filterDialog = ref(false);
-const columnSettingsDialog = ref(false);
-const currentColumnSettings = ref([]);
-const filterValues = ref({});
+const internalSearch = ref(""); // 
+const internalPage = ref(1); // 
+const internalItemsPerPage = ref(10); // 
+const filterDialog = ref(false); // 
+const columnSettingsDialog = ref(false); // 
+const currentColumnSettings = ref([]); // 
+const filterValues = ref({}); // 
 
 const initializeFilterValues = () => {
   const newValues = {};
-  props.filterDefinitions.forEach(def => {
+  props.filterDefinitions.forEach(def => { // 
     if (def.items) {
       newValues[def.key] = [];
     } else if (def.type === 'range') {
@@ -356,14 +354,12 @@ const initializeFilterValues = () => {
       newValues[def.key] = null;
     }
   });
-  filterValues.value = newValues;
+  filterValues.value = newValues; // 
 };
 
 watch(() => props.filterDefinitions, () => {
   initializeFilterValues();
-}, { immediate: true, deep: true });
-
-
+}, { immediate: true, deep: true }); // 
 const originalColumnSettings = computed(() =>
   props.headers.map((h) => ({
     ...h,
@@ -371,8 +367,7 @@ const originalColumnSettings = computed(() =>
     key: h.key,
     mandatory: h.mandatory || false,
   }))
-);
-
+); // 
 watch(
   () => props.headers,
   () => {
@@ -381,8 +376,7 @@ watch(
     );
   },
   { immediate: true }
-);
-
+); // 
 const activeFiltersDisplay = computed(() => {
   const filters = [];
   for (const key in filterValues.value) {
@@ -393,11 +387,13 @@ const activeFiltersDisplay = computed(() => {
 
     if (definition.items && Array.isArray(value) && value.length > 0) {
       value.forEach(v => {
+        // Zde upraveno pro zobrazení textu u filtru, pokud je položka objekt s 'text' vlastností
+        const displayValue = typeof v === 'object' && v !== null && 'text' in v ? v.text : `${v} ${definition.suffix || ''}`.trim(); // 
         filters.push({
           key,
           label: definition.label,
           value: v,
-          displayValue: `${v} ${definition.suffix || ''}`.trim(),
+          displayValue: definition.items.find(item => typeof item === 'object' && item.value === v)?.text || displayValue,
         });
       });
     } else if (definition.type === 'range') {
@@ -406,7 +402,7 @@ const activeFiltersDisplay = computed(() => {
           key, subKey: 'min',
           label: `${definition.label} od`,
           value: value.min,
-          displayValue: `${definition.prefix || ''}${value.min}`
+          displayValue: `${definition.prefix || ''}${value.min}` // 
         });
       }
       if (value.max) {
@@ -414,7 +410,7 @@ const activeFiltersDisplay = computed(() => {
           key, subKey: 'max',
           label: `${definition.label} do`,
           value: value.max,
-          displayValue: `${definition.prefix || ''}${value.max}`
+          displayValue: `${definition.prefix || ''}${value.max}` // 
         });
       }
     } else if (definition.type === 'text' && value) {
@@ -423,7 +419,7 @@ const activeFiltersDisplay = computed(() => {
           label: definition.label,
           value: value,
           displayValue: value
-        });
+        }); // 
     }
   }
   return filters;
@@ -431,83 +427,73 @@ const activeFiltersDisplay = computed(() => {
 
 const removeFilter = (filter) => {
   if (Array.isArray(filterValues.value[filter.key])) {
-    filterValues.value[filter.key] = filterValues.value[filter.key].filter(v => v !== filter.value);
+    filterValues.value[filter.key] = filterValues.value[filter.key].filter(v => v !== filter.value); // 
   } else if (filter.subKey) { // Pro range
-    filterValues.value[filter.key][filter.subKey] = null;
+    filterValues.value[filter.key][filter.subKey] = null; // 
   } else {
     filterValues.value[filter.key] = null;
   }
   emit("apply-filters", filterValues.value);
-};
-
+}; // 
 const visibleAndOrderedHeaders = computed(() => {
-  return currentColumnSettings.value.filter((h) => h.visible);
-});
-
+  return currentColumnSettings.value.filter((h) => h.visible); // 
+}); // 
 const isColumnVisible = (key) => {
   const header = currentColumnSettings.value.find((h) => h.key === key);
-  return header ? header.visible : false;
-};
+  return header ? header.visible : false; // 
+}; // 
 
 const paginatedMobileItems = computed(() => {
   const start = (internalPage.value - 1) * internalItemsPerPage.value;
   const end = start + internalItemsPerPage.value;
   return props.items.slice(start, end);
-});
-
+}); // 
 watch(internalSearch, (newSearch) => {
-  emit("update:search", newSearch);
-  internalPage.value = 1;
-});
-
+  emit("update:search", newSearch); // 
+  internalPage.value = 1; // 
+}); // 
 watch(internalItemsPerPage, (newItemsPerPage) => {
-  emit("update:itemsPerPage", newItemsPerPage);
-  internalPage.value = 1;
-});
-
+  emit("update:itemsPerPage", newItemsPerPage); // 
+  internalPage.value = 1; // 
+}); // 
 watch(internalPage, (newPage) => {
-  emit("update:page", newPage);
+  emit("update:page", newPage); // 
   emit("load-items", {
     page: newPage,
     itemsPerPage: internalItemsPerPage.value,
     search: internalSearch.value,
-  });
-});
-
+  }); // 
+}); // 
 const applyFiltersAndClose = () => {
-  emit("apply-filters", filterValues.value);
-  internalPage.value = 1;
-  filterDialog.value = false;
-};
-
+  emit("apply-filters", filterValues.value); // 
+  internalPage.value = 1; // 
+  filterDialog.value = false; // 
+}; // 
 const clearFiltersAndClose = () => {
-  initializeFilterValues();
-  emit("clear-filters");
-  internalPage.value = 1;
-  filterDialog.value = false;
-};
-
+  initializeFilterValues(); // 
+  emit("clear-filters"); // 
+  internalPage.value = 1; // 
+  filterDialog.value = false; // 
+}; // 
 const applyColumnSettingsAndClose = () => {
-  emit("apply-column-settings", currentColumnSettings.value);
-  columnSettingsDialog.value = false;
-};
-
+  emit("apply-column-settings", currentColumnSettings.value); // 
+  columnSettingsDialog.value = false; // 
+}; // 
 const resetColumnSettings = () => {
   currentColumnSettings.value = JSON.parse(
     JSON.stringify(originalColumnSettings.value)
   );
-  emit("reset-column-settings");
-};
-
+  emit("reset-column-settings"); // 
+}; // 
 const handleUpdateOptions = (options) => {
-  emit("load-items", options);
-};
+  emit("load-items", options); // 
+}; // 
 </script>
 
 <style scoped>
 .column-settings-container {
   max-height: 400px;
-  overflow-y: auto;
+  overflow-y: auto; /*  */
 }
 .draggable-list {
   list-style-type: none;
@@ -517,14 +503,14 @@ const handleUpdateOptions = (options) => {
   display: flex;
   align-items: center;
   padding: 8px;
-  background-color: rgb(var(--v-theme-surface-variant));
-  border: 1px solid rgba(var(--v-theme-on-surface), 0.1);
+  background-color: rgb(var(--v-theme-surface-variant)); /*  */
+  border: 1px solid rgba(var(--v-theme-on-surface), 0.1); /*  */
   margin-bottom: 4px;
   border-radius: 4px;
 }
 .draggable-item-table-settings .handle {
   cursor: grab;
-  margin-right: 8px;
+  margin-right: 8px; /*  */
 }
 .hover-row :deep(tbody tr:hover) {
   cursor: pointer;

@@ -13,7 +13,7 @@
       :loading="loading"
       :additionalButton="false"
       :mobileTitleKey="viewMode === 'receipts' ? 'receiptNumber' : 'item'"
-      :mobileExcludedKeys="viewMode === 'receipts' ? ['amount', 'paymentType'] : ['itemPrice', 'quantity', 'total', 'tax']"
+      :mobileExcludedKeys="viewMode === 'receipts' ? ['amount', 'paymentType', 'customer', 'note', 'printed'] : ['receiptNumber', 'itemPrice', 'quantity', 'customer', 'tax', 'total']"
       @apply-column-settings="saveColumnSettings"
       @reset-column-settings="resetColumnSettings"
       @apply-filters="handleApplyFilters"
@@ -45,6 +45,21 @@
           {{ item.paymentType }}
         </v-chip>
       </template>
+      <template #cell-receiptNumber="{ item }">
+        <span v-if="viewMode === 'products'">{{ item.receiptNumber || 'N/A' }}</span>
+      </template>
+      <template #cell-quantity="{ item }">
+        <span v-if="viewMode === 'products'">{{ item.quantity || 'N/A' }}</span>
+      </template>
+      <template #cell-customer="{ item }">
+        <span v-if="viewMode === 'products'">{{ item.customer || 'N/A' }}</span>
+      </template>
+      <template #cell-note="{ item }">
+        <span v-if="viewMode === 'receipts'">{{ item.note || 'N/A' }}</span>
+      </template>
+      <template #cell-printed="{ item }">
+        <span v-if="viewMode === 'receipts'">{{ item.printed === 1 ? 'Ano' : 'Ne' }}</span>
+      </template>
 
       <template #mobile-title="{ item }">
         <span v-if="viewMode === 'receipts'">
@@ -63,6 +78,15 @@
           <span v-if="isColumnVisible('paymentType')" class="text-caption text-medium-emphasis">
             {{ item.paymentType }}
           </span>
+          <span v-if="isColumnVisible('customer')" class="text-caption text-medium-emphasis">
+            Zákazník: {{ item.customer || 'N/A' }}
+          </span>
+          <span v-if="isColumnVisible('note')" class="text-caption text-medium-emphasis">
+            Poznámka: {{ item.note || 'N/A' }}
+          </span>
+          <span v-if="isColumnVisible('printed')" class="text-caption text-medium-emphasis">
+            Vytištěno: {{ item.printed === 1 ? 'Ano' : 'Ne' }}
+          </span>
         </div>
         <div v-else class="d-flex flex-column align-end">
           <span v-if="isColumnVisible('total')" class="font-weight-bold text-body-1">
@@ -71,11 +95,23 @@
           <span v-if="isColumnVisible('tax')" class="text-caption text-medium-emphasis">
             Daň: {{ item.tax }} %
           </span>
+          <span v-if="isColumnVisible('itemPrice')" class="text-caption text-medium-emphasis">
+            Cena za položku: {{ formatCurrency(item.itemPrice) }}
+          </span>
+          <span v-if="isColumnVisible('quantity')" class="text-caption text-medium-emphasis">
+            Množství: {{ item.quantity }}
+          </span>
+          <span v-if="isColumnVisible('customer')" class="text-caption text-medium-emphasis">
+            Zákazník: {{ item.customer || 'N/A' }}
+          </span>
+          <span v-if="isColumnVisible('receiptNumber')" class="text-caption text-medium-emphasis">
+            Účtenka: {{ item.receiptNumber || 'N/A' }}
+          </span>
         </div>
       </template>
 
     </reusable-table>
-    
+
     <v-dialog v-model="statsDialog" max-width="600">
       <v-card class="rounded-lg">
         <v-card-title class="d-flex justify-space-between align-center">
@@ -109,26 +145,30 @@ const statsDialog = ref(false);
 
 const receiptsData = ref(receiptsDataRaw);
 const salesData = ref(salesDataRaw.filter(s => s.item));
-
 const paymentTypes = computed(() => [...new Set(receiptsData.value.map(r => r.paymentType).filter(Boolean))]);
 const users = computed(() => [...new Set(receiptsData.value.map(r => r.user).filter(Boolean))]);
 const productCategories = computed(() => [...new Set(salesData.value.map(s => s.category).filter(Boolean))]);
 const salesTaxes = computed(() => [...new Set(salesData.value.map(s => s.tax))].sort((a, b) => a - b));
-
-
 const receiptFilterDefinitions = computed(() => [
   { key: 'paymentType', label: 'Typ platby', items: paymentTypes.value },
   { key: 'user', label: 'Uživatel', items: users.value },
+  { key: 'customer', label: 'Zákazník', type: 'text' },
+  { key: 'note', label: 'Poznámka', type: 'text' },
+  {
+    key: 'printed',
+    label: 'Vytištěno',
+    items: [{ value: 1, text: 'Ano' }, { value: 0, text: 'Ne' }],
+  },
   { key: 'amount', label: 'Částka', type: 'range', prefix: 'Kč' },
 ]);
-
 const productSalesFilterDefinitions = computed(() => [
   { key: 'category', label: 'Kategorie', items: productCategories.value },
   { key: 'tax', label: 'DPH', items: salesTaxes.value, suffix: '%' },
   { key: 'itemPrice', label: 'Cena za položku', type: 'range', prefix: 'Kč' },
   { key: 'quantity', label: 'Množství', type: 'range' },
+  { key: 'customer', label: 'Zákazník (prodej)', type: 'text' }, // Filtr pro zákazníka v prodejích
+  { key: 'receiptNumber', label: 'Číslo účtenky (prodej)', type: 'text' }, // Filtr pro číslo účtenky v prodejích
 ]);
-
 const currentFilterDefinitions = computed(() => {
   return viewMode.value === 'receipts' ? receiptFilterDefinitions.value : productSalesFilterDefinitions.value;
 });
@@ -142,26 +182,31 @@ const originalReceiptHeaders = [
   { title: 'Číslo účtenky', key: 'receiptNumber', align: 'start' },
   { title: 'Částka', key: 'amount', align: 'end', mandatory: true },
   { title: 'Typ platby', key: 'paymentType', align: 'start' },
+  { title: 'Zákazník', key: 'customer', align: 'start' },
+  { title: 'Poznámka', key: 'note', align: 'start' },
+  { title: 'Vytištěno', key: 'printed', align: 'center' },
   { title: 'Uživatel', key: 'user', align: 'start' },
 ];
 const originalProductSalesHeaders = [
   { title: 'Datum a čas', key: 'dateTime', align: 'start', mandatory: true },
   { title: 'Položka', key: 'item', align: 'start', mandatory: true },
+  { title: 'Číslo účtenky', key: 'receiptNumber', align: 'start' }, // Přidáno
+  { title: 'Cena za položku', key: 'itemPrice', align: 'end' }, // Přidáno
+  { title: 'Množství', key: 'quantity', align: 'end' }, // Přidáno
   { title: 'Celkem', key: 'total', align: 'end', mandatory: true },
   { title: 'Kategorie', key: 'category', align: 'start' },
   { title: 'DPH', key: 'tax', align: 'end' },
+  { title: 'Zákazník', key: 'customer', align: 'start' }, // Přidáno
 ];
-
 const receiptHeaders = ref(originalReceiptHeaders);
 const productSalesHeaders = ref(originalProductSalesHeaders);
 
 const currentHeaders = computed(() => {
   return viewMode.value === 'receipts' ? receiptHeaders.value : productSalesHeaders.value;
 });
-
 const filteredAndSearchedItems = computed(() => {
   let items = viewMode.value === 'receipts' ? receiptsData.value : salesData.value;
-  
+
   if (currentSearchTerm.value) {
     const searchTerm = currentSearchTerm.value.toLowerCase();
     items = items.filter(item =>
@@ -176,18 +221,38 @@ const filteredAndSearchedItems = computed(() => {
     if (appliedFilters.value.user?.length) items = items.filter(i => appliedFilters.value.user.includes(i.user));
     if (appliedFilters.value.amount?.min) items = items.filter(i => i.amount >= appliedFilters.value.amount.min);
     if (appliedFilters.value.amount?.max) items = items.filter(i => i.amount <= appliedFilters.value.amount.max);
-  } else {
+    if (appliedFilters.value.customer) {
+      const customerSearch = appliedFilters.value.customer.toLowerCase();
+      items = items.filter(i => i.customer && i.customer.toLowerCase().includes(customerSearch));
+    }
+    if (appliedFilters.value.note) {
+      const noteSearch = appliedFilters.value.note.toLowerCase();
+      items = items.filter(i => i.note && i.note.toLowerCase().includes(noteSearch));
+    }
+    if (appliedFilters.value.printed !== undefined && appliedFilters.value.printed !== null) {
+      items = items.filter(i => i.printed === appliedFilters.value.printed);
+    }
+
+  } else { // Prodej produktů
     if (appliedFilters.value.category?.length) items = items.filter(i => appliedFilters.value.category.includes(i.category));
     if (appliedFilters.value.tax?.length) items = items.filter(i => appliedFilters.value.tax.includes(i.tax));
     if (appliedFilters.value.itemPrice?.min) items = items.filter(i => i.itemPrice >= appliedFilters.value.itemPrice.min);
     if (appliedFilters.value.itemPrice?.max) items = items.filter(i => i.itemPrice <= appliedFilters.value.itemPrice.max);
     if (appliedFilters.value.quantity?.min) items = items.filter(i => i.quantity >= appliedFilters.value.quantity.min);
     if (appliedFilters.value.quantity?.max) items = items.filter(i => i.quantity <= appliedFilters.value.quantity.max);
+    // Nové filtry pro prodeje produktů
+    if (appliedFilters.value.customer) {
+      const customerSearch = appliedFilters.value.customer.toLowerCase();
+      items = items.filter(i => i.customer && i.customer.toLowerCase().includes(customerSearch));
+    }
+    if (appliedFilters.value.receiptNumber) {
+      const receiptNumberSearch = appliedFilters.value.receiptNumber.toLowerCase();
+      items = items.filter(i => i.receiptNumber && i.receiptNumber.toLowerCase().includes(receiptNumberSearch));
+    }
   }
 
   return items;
 });
-
 const totalSales = computed(() => filteredAndSearchedItems.value.reduce((sum, item) => sum + (item.amount || item.total || 0), 0));
 const totalReceiptsCount = computed(() => new Set(filteredAndSearchedItems.value.map(i => i.receiptNumber)).size);
 
@@ -195,7 +260,6 @@ watch(viewMode, () => {
   currentSearchTerm.value = '';
   handleClearFilters();
 });
-
 const handleApplyFilters = (filters) => appliedFilters.value = filters;
 const handleClearFilters = () => appliedFilters.value = {};
 const handleSearchUpdate = (newSearch) => currentSearchTerm.value = newSearch;
@@ -205,8 +269,6 @@ const handlePageUpdate = (newPage) => currentPage.value = newPage;
 const loadItems = () => { /* V demo verzi není potřeba */ };
 const saveColumnSettings = () => { /* Implementace uložení do localStorage */ };
 const resetColumnSettings = () => { /* Implementace resetu */ };
-
 const formatCurrency = (value) => new Intl.NumberFormat('cs-CZ', { style: 'currency', currency: 'CZK' }).format(value || 0);
 const formatDateTime = (date) => date ? new Date(date).toLocaleString('cs-CZ', { year: '2-digit', month: '2-digit', day: '2-digit', hour: '2-digit', minute: '2-digit' }) : '-';
-
 </script>

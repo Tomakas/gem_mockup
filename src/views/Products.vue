@@ -15,7 +15,7 @@
       additionalButtonText="Nový produkt"
       @additional-button-click="addNewProduct"
       mobileTitleKey="productName"
-      :mobileExcludedKeys="['price', 'tax']"
+      :mobileExcludedKeys="['price', 'tax', 'Dodavatel', 'Poznámka']"
       @row-click="openProductDetail"
       @apply-column-settings="saveProductColumnSettings"
       @reset-column-settings="resetProductColumnSettings"
@@ -31,11 +31,32 @@
       </template>
       <template #cell-tax="{ item }">{{ item.tax }} %</template>
       <template #cell-price="{ item }">{{ formatCurrency(item.price) }}</template>
-    
+      <template #cell-Dodavatel="{ item }">{{ item.Dodavatel || 'N/A' }}</template>
+      <template #cell-Poznámka="{ item }">{{ item.Poznámka || 'N/A' }}</template>
+
       <template #mobile-title="{ item }">
         {{ item.productName }}
       </template>
-
+      <template #mobile-append="{ item, isColumnVisible }">
+        <div class="d-flex flex-column align-end">
+          <span v-if="isColumnVisible('price')" class="font-weight-bold text-body-1">
+            <slot name="cell-price" :item="item">
+              {{ item.price }}
+            </slot>
+          </span>
+          <span v-if="isColumnVisible('tax')" class="text-caption text-medium-emphasis">
+            <slot name="cell-tax" :item="item">
+              Daň: {{ item.tax }} %
+            </slot>
+          </span>
+          <span v-if="isColumnVisible('Dodavatel')" class="text-caption text-medium-emphasis">
+            Dodavatel: {{ item.Dodavatel || 'N/A' }}
+          </span>
+          <span v-if="isColumnVisible('Poznámka')" class="text-caption text-medium-emphasis">
+            Poznámka: {{ item.Poznámka || 'N/A' }}
+          </span>
+        </div>
+      </template>
     </reusable-table>
 
     <product-detail
@@ -59,56 +80,65 @@ const loading = ref(false);
 const appliedFilters = ref({});
 const productDetailDialog = ref(false);
 const selectedProduct = ref(null);
-
 const originalHeaders = [
   { title: 'Název produktu', key: 'productName', dataAlign: 'end', mandatory: true },
   { title: 'Kategorie', key: 'category', dataAlign: 'end' },
   { title: 'Cena', key: 'price', dataAlign: 'end', mandatory: true },
   { title: 'Daň', key: 'tax', dataAlign: 'end' },
+  { title: 'Dodavatel', key: 'Dodavatel', dataAlign: 'start', visible: true }, // Přidáno
   { title: 'Barva', key: 'Barva', dataAlign: 'center', visible: true },
   { title: 'SKU', key: 'SKU', dataAlign: 'start', visible: true },
+  { title: 'Poznámka', key: 'Poznámka', dataAlign: 'start', visible: true }, // Přidáno
 ];
 const productHeaders = ref(originalHeaders);
 
 const products = ref([]);
 const categories = ref([]);
 const taxes = ref([]);
-
+const suppliers = ref([]); // Nová proměnná pro dodavatele
 const productFilterDefinitions = computed(() => [
-  { 
-    key: 'category', 
-    label: 'Kategorie', 
+  {
+    key: 'category',
+    label: 'Kategorie',
     items: categories.value
   },
-  { 
-    key: 'tax', 
-    label: 'Daň', 
+  {
+    key: 'tax',
+    label: 'Daň',
     items: taxes.value,
     suffix: '%'
   },
-  { 
-    key: 'price', 
-    label: 'Cena', 
-    type: 'range', 
+  {
+    key: 'price',
+    label: 'Cena',
+    type: 'range',
     prefix: 'Kč'
-  }
+  },
+  {
+    key: 'Dodavatel', // Nový filtr pro dodavatele
+    label: 'Dodavatel',
+    items: suppliers.value
+  },
+  {
+    key: 'Poznámka', // Nový filtr pro poznámku
+    label: 'Poznámka',
+    type: 'text'
+  },
 ]);
-
 const currentSearchTerm = ref('');
 const currentPage = ref(1);
 const currentItemsPerPage = ref(10);
-
 onMounted(() => {
   try {
     products.value = productDataJson;
     categories.value = [...new Set(products.value.map((p) => p.category))].sort();
     taxes.value = [...new Set(products.value.map((p) => p.tax))].sort((a, b) => a - b);
+    suppliers.value = [...new Set(products.value.map((p) => p.Dodavatel).filter(Boolean))].sort(); // Načtení dodavatelů
   } catch (error) {
     console.error('Chyba při načítání dat produktů:', error);
     products.value = [];
   }
 });
-
 const filteredProducts = computed(() => {
   let filtered = products.value;
 
@@ -133,9 +163,17 @@ const filteredProducts = computed(() => {
   if (appliedFilters.value.price?.max) {
     filtered = filtered.filter((product) => product.price <= appliedFilters.value.price.max);
   }
+  // Filtrace pro Dodavatele a Poznámku
+  if (appliedFilters.value.Dodavatel?.length > 0) {
+    filtered = filtered.filter((product) => appliedFilters.value.Dodavatel.includes(product.Dodavatel));
+  }
+  if (appliedFilters.value.Poznámka) {
+    const noteSearch = appliedFilters.value.Poznámka.toLowerCase();
+    filtered = filtered.filter((product) => product.Poznámka && product.Poznámka.toLowerCase().includes(noteSearch));
+  }
+
   return filtered;
 });
-
 const formatCurrency = (value) => {
   if (value === null || value === undefined) return '';
   return new Intl.NumberFormat('cs-CZ', { style: 'currency', currency: 'CZK' }).format(value);
@@ -148,14 +186,12 @@ const loadItems = () => {
   loading.value = true;
   setTimeout(() => { loading.value = false; }, 300);
 };
-
 const handleApplyFilters = (filters) => {
   appliedFilters.value = filters;
 };
 const handleClearFilters = () => {
   appliedFilters.value = {};
 };
-
 const addNewProduct = () => {
   selectedProduct.value = {};
   productDetailDialog.value = true;
@@ -187,7 +223,3 @@ const viewSales = (item) => { console.log(`Zobrazit prodeje pro produkt: ${item.
 const saveProductColumnSettings = (newSettings) => { localStorage.setItem('productColumnSettings', JSON.stringify(newSettings)); };
 const resetProductColumnSettings = () => { localStorage.removeItem('productColumnSettings'); };
 </script>
-
-<style scoped>
-/* Tento soubor nepotřebuje žádné specifické styly */
-</style>
