@@ -1,5 +1,3 @@
-// File: /src/components/ReusableTable.vue
-
 <template>
   <v-container fluid class="generic-list">
     <v-card>
@@ -46,7 +44,18 @@
         </v-row>
 
         <div class="active-filters-container mb-4">
-          <slot name="active-filters"></slot>
+          <div v-if="activeFiltersDisplay.length > 0" class="d-flex flex-wrap align-center ga-2">
+            <span class="text-caption">Aktivní filtry:</span>
+            <v-chip
+              v-for="(filter, index) in activeFiltersDisplay"
+              :key="index"
+              closable
+              @click:close="removeFilter(filter)"
+              size="small"
+            >
+              <strong>{{ filter.label }}:</strong>&nbsp;{{ filter.displayValue }}
+            </v-chip>
+          </div>
         </div>
 
         <v-dialog v-model="filterDialog" v-if="enableFilters">
@@ -59,7 +68,55 @@
             </v-card-title>
             <v-divider></v-divider>
             <v-card-text class="py-4">
-              <slot name="filters"></slot>
+              <div v-for="(def, index) in filterDefinitions" :key="def.key">
+                <div class="text-subtitle-1 mb-2">{{ def.label }}</div>
+
+                <v-chip-group v-if="def.type === 'multiselect-chips'" v-model="filterValues[def.key]" multiple class="chip-group-wrap mb-4">
+                  <v-chip v-for="item in def.items" :key="item" :value="item" filter>
+                    {{ def.itemText ? item[def.itemText] : item }} {{ def.suffix || '' }}
+                  </v-chip>
+                </v-chip-group>
+
+                <v-select
+                  v-if="def.type === 'select'"
+                  v-model="filterValues[def.key]"
+                  :items="def.items"
+                  :label="def.label"
+                  clearable
+                  class="mb-4"
+                ></v-select>
+
+                <v-text-field
+                  v-if="def.type === 'text'"
+                  v-model="filterValues[def.key]"
+                  :label="def.label"
+                  clearable
+                  class="mb-4"
+                ></v-text-field>
+
+                <v-row v-if="def.type === 'range'" class="mb-4">
+                  <v-col cols="12" sm="6">
+                    <v-text-field
+                      v-model.number="filterValues[def.key].min"
+                      :label="`${def.label} od`"
+                      type="number"
+                      :prefix="def.prefix || ''"
+                      clearable
+                    ></v-text-field>
+                  </v-col>
+                  <v-col cols="12" sm="6">
+                    <v-text-field
+                      v-model.number="filterValues[def.key].max"
+                      :label="`${def.label} do`"
+                      type="number"
+                      :prefix="def.prefix || ''"
+                      clearable
+                    ></v-text-field>
+                  </v-col>
+                </v-row>
+
+                <v-divider v-if="index < filterDefinitions.length - 1" class="my-4"></v-divider>
+              </div>
             </v-card-text>
             <v-divider></v-divider>
             <v-card-actions class="d-flex justify-end pa-4">
@@ -106,7 +163,7 @@
                     <div
                       :class="[
                         'draggable-item-table-settings',
-                        { 'mandatory-column': element.mandatory }, // Přidána nová třída pro povinné
+                        { 'mandatory-column': element.mandatory },
                       ]"
                     >
                       <v-icon class="handle mr-2">mdi-drag-vertical</v-icon>
@@ -293,8 +350,8 @@
 </template>
 
 <script setup>
-import { ref, computed, watch, watchEffect } from "vue"; //
-import draggable from "vuedraggable"; //
+import { ref, computed, watch } from "vue";
+import draggable from "vuedraggable";
 
 const props = defineProps({
   headers: { type: Array, required: true },
@@ -303,16 +360,17 @@ const props = defineProps({
   searchLabel: { type: String, default: "Hledat" },
   enableFilters: { type: Boolean, default: false },
   filterDialogTitle: { type: String, default: "Filtry" },
+  filterDefinitions: { type: Array, default: () => [] },
   enableColumnSettings: { type: Boolean, default: false },
   columnSettingsDialogTitle: { type: String, default: "Nastavení sloupců" },
   additionalButton: { type: Boolean, default: false },
   additionalButtonText: { type: String, default: "" },
   mobileTitleKey: { type: String, required: true },
-  mobileExcludedKeys: { type: Array, default: () => [] }, //
+  mobileExcludedKeys: { type: Array, default: () => [] },
   loading: { type: Boolean, default: false },
 });
+
 const emit = defineEmits([
-  //
   "row-click",
   "apply-filters",
   "clear-filters",
@@ -324,29 +382,46 @@ const emit = defineEmits([
   "apply-column-settings",
   "reset-column-settings",
 ]);
-const internalSearch = ref(""); //
+
+const internalSearch = ref("");
 const internalPage = ref(1);
 const internalItemsPerPage = ref(10);
 const filterDialog = ref(false);
 const columnSettingsDialog = ref(false);
-const currentColumnSettings = ref([]); //
+const currentColumnSettings = ref([]);
+const filterValues = ref({});
 
-// Original column settings are now a computed property based on props.headers
-// This ensures it updates if props.headers change.
+const initializeFilterValues = () => {
+  const newValues = {};
+  props.filterDefinitions.forEach(def => {
+    if (def.type === 'range') {
+      newValues[def.key] = { min: null, max: null };
+    } else if (def.type === 'multiselect-chips') {
+      newValues[def.key] = [];
+    } else {
+      newValues[def.key] = null;
+    }
+  });
+  filterValues.value = newValues;
+};
+
+watch(() => props.filterDefinitions, () => {
+  initializeFilterValues();
+}, { immediate: true, deep: true });
+
+
 const originalColumnSettings = computed(() =>
   props.headers.map((h) => ({
     ...h,
     visible: h.visible !== undefined ? h.visible : true,
     key: h.key,
+    mandatory: h.mandatory || false,
   }))
-); //
+);
 
 watch(
   () => props.headers,
   () => {
-    // Pokaždé, když se změní hlavičky, resetujeme aktuální nastavení na základě
-    // reaktivní `computed` vlastnosti `originalColumnSettings`.
-    // Používáme deep copy, aby změny v `currentColumnSettings` neovlivnily originál.
     currentColumnSettings.value = JSON.parse(
       JSON.stringify(originalColumnSettings.value)
     );
@@ -354,14 +429,77 @@ watch(
   { immediate: true }
 );
 
+const activeFiltersDisplay = computed(() => {
+  const filters = [];
+  for (const key in filterValues.value) {
+    const definition = props.filterDefinitions.find(def => def.key === key);
+    if (!definition) continue;
+
+    const value = filterValues.value[key];
+
+    if (definition.type === 'multiselect-chips' && value.length > 0) {
+      value.forEach(v => {
+        filters.push({
+          key,
+          type: definition.type,
+          label: definition.label,
+          value: v,
+          displayValue: `${v} ${definition.suffix || ''}`.trim(),
+        });
+      });
+    } else if (definition.type === 'range') {
+      if (value.min) {
+        filters.push({
+          key,
+          subKey: 'min',
+          type: definition.type,
+          label: `${definition.label} od`,
+          value: value.min,
+          displayValue: `${definition.prefix || ''}${value.min}`
+        });
+      }
+      if (value.max) {
+        filters.push({
+          key,
+          subKey: 'max',
+          type: definition.type,
+          label: `${definition.label} do`,
+          value: value.max,
+          displayValue: `${definition.prefix || ''}${value.max}`
+        });
+      }
+    } else if (value) {
+        filters.push({
+          key,
+          type: definition.type,
+          label: definition.label,
+          value: value,
+          displayValue: value
+        });
+    }
+  }
+  return filters;
+});
+
+const removeFilter = (filter) => {
+  if (filter.type === 'multiselect-chips') {
+    filterValues.value[filter.key] = filterValues.value[filter.key].filter(v => v !== filter.value);
+  } else if (filter.type === 'range') {
+    filterValues.value[filter.key][filter.subKey] = null;
+  } else {
+    filterValues.value[filter.key] = null;
+  }
+  emit("apply-filters", filterValues.value);
+};
+
+
 const visibleAndOrderedHeaders = computed(() => {
-  //
   return currentColumnSettings.value.filter((h) => h.visible);
 });
+
 const isColumnVisible = (key) => {
-  //
   const header = currentColumnSettings.value.find((h) => h.key === key);
-  return header ? header.visible : false; //
+  return header ? header.visible : false;
 };
 
 const paginatedMobileItems = computed(() => {
@@ -369,18 +507,18 @@ const paginatedMobileItems = computed(() => {
   const end = start + internalItemsPerPage.value;
   return props.items.slice(start, end);
 });
+
 watch(internalSearch, (newSearch) => {
-  //
   emit("update:search", newSearch);
   internalPage.value = 1;
 });
+
 watch(internalItemsPerPage, (newItemsPerPage) => {
-  //
   emit("update:itemsPerPage", newItemsPerPage);
   internalPage.value = 1;
 });
+
 watch(internalPage, (newPage) => {
-  //
   emit("update:page", newPage);
   emit("load-items", {
     page: newPage,
@@ -388,78 +526,69 @@ watch(internalPage, (newPage) => {
     search: internalSearch.value,
   });
 });
+
 const applyFiltersAndClose = () => {
-  //
-  emit("apply-filters");
+  emit("apply-filters", filterValues.value);
   internalPage.value = 1;
   filterDialog.value = false;
 };
+
 const clearFiltersAndClose = () => {
-  //
+  initializeFilterValues();
   emit("clear-filters");
   internalPage.value = 1;
   filterDialog.value = false;
 };
+
 const applyColumnSettingsAndClose = () => {
-  //
   emit("apply-column-settings", currentColumnSettings.value);
   columnSettingsDialog.value = false;
 };
+
 const resetColumnSettings = () => {
-  //
   currentColumnSettings.value = JSON.parse(
     JSON.stringify(originalColumnSettings.value)
   );
   emit("reset-column-settings");
 };
+
 const handleUpdateOptions = (options) => {
-  //
   emit("load-items", options);
 };
 </script>
 
 <style scoped>
-/* Styly zůstávají stejné */
 .column-settings-container {
   max-height: 400px;
-  /*  */
   overflow-y: auto;
 }
 
 .draggable-list {
   list-style-type: none;
   padding: 0;
-  /* background-color: aquamarine; */
-  /*  */
-  /* Removed debugging color */
 }
 
 .draggable-item-table-settings {
   display: flex;
   align-items: center;
   padding: 8px;
-  /*  */
-  /* Use Vuetify theme variables for background and border */
   background-color: rgb(var(--v-theme-surface-variant));
-  /*  */
-  /* A lighter background that fits the theme */
   border: 1px solid rgb(var(--v-theme-on-surface), 0.1);
-  /*  */
-  /* A subtle border from on-surface color */
   margin-bottom: 4px;
   border-radius: 4px;
 }
 
 .draggable-item-table-settings .handle {
   cursor: grab;
-  /*  */
   margin-right: 8px;
-  /* background-color: slategrey; */
-  /* Removed debugging color */
 }
 
 .hover-row :deep(tbody tr:hover) {
   cursor: pointer;
-  /*  */
+}
+
+.chip-group-wrap :deep(.v-chip-group__container) {
+  flex-wrap: wrap;
+  gap: 8px;
 }
 </style>
