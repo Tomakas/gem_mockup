@@ -1,8 +1,7 @@
 <template>
   <v-app :theme="theme">
     <v-app-bar app>
-      <v-app-bar-nav-icon v-if="display.mdAndDown.value"
-        @click="drawer = !drawer"></v-app-bar-nav-icon>
+      <v-app-bar-nav-icon v-if="display.mdAndDown.value" @click="drawer = !drawer"></v-app-bar-nav-icon>
 
       <v-app-bar-title>Elementary POS Administrace</v-app-bar-title>
 
@@ -24,20 +23,16 @@
           <v-btn icon v-bind="props" class="ml-2">
             <v-avatar size="32">
               <v-img :src="selectedLanguage.imageUrl" :alt="selectedLanguage.name + ' vlajka'"
-                     onerror="this.src='https://placehold.co/32x32/E0E0E0/333333?text=?'"></v-img>
+                onerror="this.src='https://placehold.co/32x32/E0E0E0/333333?text=?'"></v-img>
             </v-avatar>
           </v-btn>
         </template>
         <v-list>
-          <v-list-item
-            v-for="(lang, i) in languages"
-            :key="i"
-            @click="selectLanguage(lang)"
-          >
+          <v-list-item v-for="(lang, i) in languages" :key="i" @click="selectLanguage(lang)">
             <template v-slot:prepend>
               <v-avatar size="32">
                 <v-img :src="lang.imageUrl" :alt="lang.name + ' vlajka'"
-                       onerror="this.src='https://placehold.co/32x32/E0E0E0/333333?text=?'"></v-img>
+                  onerror="this.src='https://placehold.co/32x32/E0E0E0/333333?text=?'"></v-img>
               </v-avatar>
             </template>
             <v-list-item-title>{{ lang.name }}</v-list-item-title>
@@ -58,19 +53,17 @@
             <v-list-item-title>Uživatel Tomas</v-list-item-title>
           </v-list-item>
           <v-list-item>
+            <v-list-item-title>Nastavení uživatele</v-list-item-title>
+          </v-list-item>
+          <v-list-item>
             <v-list-item-title>Odhlásit se</v-list-item-title>
           </v-list-item>
         </v-list>
       </v-menu>
     </v-app-bar>
 
-    <v-navigation-drawer
-      v-model="drawer"
-      :permanent="isSideNav && display.lgAndUp.value"
-      :expand-on-hover="isSideNav && display.lgAndUp.value"
-      location="left"
-      app
-    >
+    <v-navigation-drawer v-model="drawer" :permanent="isSideNav && display.lgAndUp.value"
+      :expand-on-hover="isSideNav && display.lgAndUp.value" location="left" app>
       <v-divider></v-divider>
 
       <v-list dense nav>
@@ -82,7 +75,7 @@
     </v-navigation-drawer>
 
     <v-main>
-      <v-container fluid class="pa-0 pa-sm-1 pa-md-2" >
+      <v-container fluid class="pa-0 pa-sm-1 pa-md-2">
         <router-view></router-view>
       </v-container>
     </v-main>

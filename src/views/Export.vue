@@ -68,6 +68,14 @@
               </v-btn>
             </v-card>
           </v-col>
+          <v-col cols="12" sm="6" md="4">
+            <v-card class="pa-4 text-center d-flex flex-column align-center justify-center" flat min-height="150">
+              <div class="text-h6 mb-3">Export skladových pohybů</div>
+              <v-btn color="secondary" prepend-icon="mdi-file-export" @click="exportCategories">
+                Exportovat
+              </v-btn>
+            </v-card>
+          </v-col>
         </v-row>
       </v-col>
     </v-row>
