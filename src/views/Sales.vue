@@ -25,10 +25,10 @@
     >
       <template #header-left-content>
         <div class="d-flex align-center flex-grow-1">
-          <v-btn-toggle v-model="viewMode" rounded="1" color="primary" group class="flex-grow-1" style="flex-shrink: 0;">
-            <v-btn value="receipts" class="flex-grow-1">Účtenky</v-btn>
-            <v-btn value="products" class="flex-grow-1">Produkty</v-btn>
-          </v-btn-toggle>
+          <v-tabs v-model="viewMode" color="primary" class="flex-grow-1">
+            <v-tab value="receipts">Účtenky</v-tab>
+            <v-tab value="products">Produkty</v-tab>
+          </v-tabs>
           <v-btn icon variant="text" @click="statsDialog = true" class="ml-2">
             <v-icon>mdi-sigma</v-icon>
           </v-btn>
@@ -138,13 +138,12 @@ import { ref, computed, watch } from 'vue';
 import receiptsDataRaw from '/src/data/receipts.json';
 import salesDataRaw from '/src/data/sales.json';
 import ReusableTable from '/src/components/ReusableTable.vue';
-import { formatCurrency } from '@/utils/formatters.js'; // <-- NOVÝ IMPORT
+import { formatCurrency } from '@/utils/formatters.js';
 
 const loading = ref(false);
 const viewMode = ref('receipts');
 const appliedFilters = ref({});
 const statsDialog = ref(false);
-
 const receiptsData = ref(receiptsDataRaw);
 const salesData = ref(salesDataRaw.filter(s => s.item));
 
@@ -152,7 +151,6 @@ const paymentTypes = computed(() => [...new Set(receiptsData.value.map(r => r.pa
 const users = computed(() => [...new Set(receiptsData.value.map(r => r.user).filter(Boolean))]);
 const productCategories = computed(() => [...new Set(salesData.value.map(s => s.category).filter(Boolean))]);
 const salesTaxes = computed(() => [...new Set(salesData.value.map(s => s.tax))].sort((a, b) => a - b));
-
 const receiptFilterDefinitions = computed(() => [
   { key: 'paymentType', label: 'Typ platby', items: paymentTypes.value },
   { key: 'user', label: 'Uživatel', items: users.value },
@@ -165,7 +163,6 @@ const receiptFilterDefinitions = computed(() => [
   },
   { key: 'amount', label: 'Částka', type: 'range', prefix: 'Kč' },
 ]);
-
 const productSalesFilterDefinitions = computed(() => [
   { key: 'category', label: 'Kategorie', items: productCategories.value },
   { key: 'tax', label: 'DPH', items: salesTaxes.value, suffix: '%' },
@@ -174,7 +171,6 @@ const productSalesFilterDefinitions = computed(() => [
   { key: 'customer', label: 'Zákazník (prodej)', type: 'text' },
   { key: 'receiptNumber', label: 'Číslo účtenky (prodej)', type: 'text' },
 ]);
-
 const currentFilterDefinitions = computed(() => {
   return viewMode.value === 'receipts' ? receiptFilterDefinitions.value : productSalesFilterDefinitions.value;
 });
@@ -193,7 +189,6 @@ const originalReceiptHeaders = [
   { title: 'Vytištěno', key: 'printed', align: 'center' },
   { title: 'Uživatel', key: 'user', align: 'start' },
 ];
-
 const originalProductSalesHeaders = [
   { title: 'Datum a čas', key: 'dateTime', align: 'start', mandatory: true },
   { title: 'Položka', key: 'item', align: 'start', mandatory: true },
@@ -205,14 +200,12 @@ const originalProductSalesHeaders = [
   { title: 'DPH', key: 'tax', align: 'end' },
   { title: 'Zákazník', key: 'customer', align: 'start' },
 ];
-
 const receiptHeaders = ref(originalReceiptHeaders);
 const productSalesHeaders = ref(originalProductSalesHeaders);
 const currentHeaders = computed(() => {
   return viewMode.value === 'receipts' ? receiptHeaders.value : productSalesHeaders.value;
 });
 
-// REFAKTORIZACE - ČÁST 1: Logika filtrování pro účtenky
 const filteredReceipts = computed(() => {
   let items = receiptsData.value;
   if (appliedFilters.value.paymentType?.length) items = items.filter(i => appliedFilters.value.paymentType.includes(i.paymentType));
@@ -234,7 +227,6 @@ const filteredReceipts = computed(() => {
   return items;
 });
 
-// REFAKTORIZACE - ČÁST 2: Logika filtrování pro prodeje produktů
 const filteredProductSales = computed(() => {
   let items = salesData.value;
   if (appliedFilters.value.category?.length) items = items.filter(i => appliedFilters.value.category.includes(i.category));
@@ -254,7 +246,7 @@ const filteredProductSales = computed(() => {
   return items;
 });
 
-// REFAKTORIZACE - ČÁST 3: Hlavní property nyní jen přepíná a vyhledává
+
 const filteredAndSearchedItems = computed(() => {
   let items = viewMode.value === 'receipts' ? filteredReceipts.value : filteredProductSales.value;
 
@@ -268,7 +260,6 @@ const filteredAndSearchedItems = computed(() => {
   }
   return items;
 });
-
 
 const totalSales = computed(() => filteredAndSearchedItems.value.reduce((sum, item) => sum + (item.amount || item.total || 0), 0));
 const totalReceiptsCount = computed(() => {
@@ -286,7 +277,6 @@ const handleClearFilters = () => appliedFilters.value = {};
 const handleSearchUpdate = (newSearch) => currentSearchTerm.value = newSearch;
 const handleItemsPerPageUpdate = (newItemsPerPage) => currentItemsPerPage.value = newItemsPerPage;
 const handlePageUpdate = (newPage) => currentPage.value = newPage;
-
 const loadItems = () => { /* V demo verzi není potřeba */ };
 const saveColumnSettings = () => { /* Implementace uložení do localStorage */ };
 const resetColumnSettings = () => { /* Implementace resetu */ };

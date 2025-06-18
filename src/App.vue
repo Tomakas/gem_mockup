@@ -126,14 +126,6 @@ const selectLanguage = (lang) => {
   localStorage.setItem('app-language', lang.code);
 };
 
-const toggleNavPosition = (newVal) => {
-  isSideNav.value = newVal;
-  localStorage.setItem('nav-position', isSideNav.value ? 'side' : 'top');
-  if (!isSideNav.value) {
-    drawer.value = false;
-  }
-};
-
 onMounted(() => {
   const savedTheme = localStorage.getItem('app-theme');
   if (savedTheme) {
@@ -156,11 +148,6 @@ onMounted(() => {
 
   // ZMĚNA: Počáteční stav draweru se řídí breakpointem LG
   drawer.value = isSideNav.value && display.lgAndUp.value;
-});
-
-watch(isSideNav, (newVal) => {
-  // ZMĚNA: Reaktivita draweru se řídí breakpointem LG
-  drawer.value = newVal && display.lgAndUp.value;
 });
 
 // ZMĚNA: Sledujeme změnu breakpointu LG

@@ -1,0 +1,149 @@
+{
+  "stockDocuments": [
+    {
+      "id": "P2025001",
+      "type": "Příjemka",
+      "documentNumber": "P2025001",
+      "dateTime": "2025-06-15T09:15:00",
+      "supplier": "GlobalTech Solutions",
+      "itemCount": 3,
+      "totalPurchasePrice": 39500,
+      "totalSellingPrice": 53000,
+      "items": [
+        { "productId": 1, "productName": "Smartphone X", "purchasePrice": 10000, "quantity": 2, "total": 20000 },
+        { "productId": 2, "productName": "Laptop Pro", "purchasePrice": 18000, "quantity": 1, "total": 18000 },
+        { "productId": 4, "productName": "Bezdrátová sluchátka", "purchasePrice": 1500, "quantity": 1, "total": 1500 }
+      ]
+    },
+    {
+      "id": "INV202501",
+      "type": "Inventura",
+      "documentNumber": "INV202501",
+      "dateTime": "2025-06-10T18:00:00",
+      "supplier": null,
+      "itemCount": 2,
+      "totalPurchasePrice": -400,
+      "totalSellingPrice": -700,
+      "items": [
+        { "productId": 8, "productName": "Chytrá žárovka", "purchasePrice": 200, "quantity": -2, "total": -400 },
+        { "productId": 12, "productName": "Pánská košile", "purchasePrice": 0, "quantity": 0, "total": 0 }
+      ]
+    },
+    {
+      "id": "P2025002",
+      "type": "Příjemka",
+      "documentNumber": "P2025002",
+      "dateTime": "2025-06-12T11:30:00",
+      "supplier": "HomeEssentials Ltd.",
+      "itemCount": 2,
+      "totalPurchasePrice": 9000,
+      "totalSellingPrice": 11500,
+      "items": [
+        { "productId": 6, "productName": "Kávovar Deluxe", "purchasePrice": 4500, "quantity": 1, "total": 4500 },
+        { "productId": 7, "productName": "Robotický vysavač", "purchasePrice": 4500, "quantity": 1, "total": 4500 }
+      ]
+    },
+    {
+      "id": "O2025001",
+      "type": "Oprava skladu",
+      "documentNumber": "O2025001",
+      "dateTime": "2025-06-13T14:00:00",
+      "supplier": null,
+      "itemCount": 1,
+      "totalPurchasePrice": -1200,
+      "totalSellingPrice": -1800,
+      "items": [
+        { "productId": 11, "productName": "Sportovní obuv", "purchasePrice": 1200, "quantity": -1, "total": -1200 }
+      ]
+    },
+    {
+      "id": "P2025003",
+      "type": "Příjemka",
+      "documentNumber": "P2025003",
+      "dateTime": "2025-06-16T10:00:00",
+      "supplier": "BookWorld Publishers",
+      "itemCount": 2,
+      "totalPurchasePrice": 22500,
+      "totalSellingPrice": 31500,
+      "items": [
+        { "productId": 21, "productName": "Fantasy román", "purchasePrice": 150, "quantity": 50, "total": 7500 },
+        { "productId": 22, "productName": "Kuchařka", "purchasePrice": 200, "quantity": 75, "total": 15000 }
+      ]
+    },
+    {
+      "id": "P2025004",
+      "type": "Příjemka",
+      "documentNumber": "P2025004",
+      "dateTime": "2025-06-17T15:20:00",
+      "supplier": "ActiveLife Gear",
+      "itemCount": 2,
+      "totalPurchasePrice": 18000,
+      "totalSellingPrice": 24000,
+      "items": [
+        { "productId": 31, "productName": "Jóga podložka", "purchasePrice": 300, "quantity": 20, "total": 6000 },
+        { "productId": 32, "productName": "Činky 5kg", "purchasePrice": 600, "quantity": 20, "total": 12000 }
+      ]
+    },
+    {
+      "id": "INV202502",
+      "type": "Inventura",
+      "documentNumber": "INV202502",
+      "dateTime": "2025-06-18T08:00:00",
+      "supplier": null,
+      "itemCount": 2,
+      "totalPurchasePrice": -150,
+      "totalSellingPrice": -250,
+      "items": [
+        { "productId": 41, "productName": "Hydratační krém", "purchasePrice": 150, "quantity": 1, "total": 150 },
+        { "productId": 42, "productName": "Šampon na vlasy", "purchasePrice": 100, "quantity": -3, "total": -300 }
+      ]
+    },
+    {
+      "id": "P2025005",
+      "type": "Příjemka",
+      "documentNumber": "P2025005",
+      "dateTime": "2025-06-19T11:00:00",
+      "supplier": "FunTime Toys",
+      "itemCount": 2,
+      "totalPurchasePrice": 11000,
+      "totalSellingPrice": 19000,
+      "items": [
+        { "productId": 36, "productName": "Stavebnice Lego", "purchasePrice": 800, "quantity": 10, "total": 8000 },
+        { "productId": 37, "productName": "Plyšák medvěd", "purchasePrice": 150, "quantity": 20, "total": 3000 }
+      ]
+    },
+    {
+      "id": "O2025002",
+      "type": "Oprava skladu",
+      "documentNumber": "O2025002",
+      "dateTime": "2025-06-20T09:00:00",
+      "supplier": null,
+      "itemCount": 1,
+      "totalPurchasePrice": -800,
+      "totalSellingPrice": -1200,
+      "items": [
+        { "productId": 36, "productName": "Stavebnice Lego", "purchasePrice": 800, "quantity": -1, "total": -800 }
+      ]
+    }
+  ],
+  "stockMovements": [
+    { "id": 1, "dateTime": "2025-06-20T14:10:00", "productName": "Jóga podložka", "change": "-1 ks", "valueChangeNC": -300 },
+    { "id": 2, "dateTime": "2025-06-20T13:55:00", "productName": "Fantasy román", "change": "-2 ks", "valueChangeNC": -300 },
+    { "id": 3, "dateTime": "2025-06-20T09:00:00", "productName": "Stavebnice Lego", "change": "-1 ks (Poškozeno)", "valueChangeNC": -800 },
+    { "id": 4, "dateTime": "2025-06-19T11:00:00", "productName": "Stavebnice Lego", "change": "+10 ks", "valueChangeNC": 8000 },
+    { "id": 5, "dateTime": "2025-06-19T11:00:00", "productName": "Plyšák medvěd", "change": "+20 ks", "valueChangeNC": 3000 },
+    { "id": 6, "dateTime": "2025-06-18T16:30:00", "productName": "Kuchařka", "change": "-5 ks", "valueChangeNC": -1000 },
+    { "id": 7, "dateTime": "2025-06-18T08:00:00", "productName": "Hydratační krém", "change": "+1 ks (Inventura)", "valueChangeNC": 150 },
+    { "id": 8, "dateTime": "2025-06-18T08:00:00", "productName": "Šampon na vlasy", "change": "-3 ks (Inventura)", "valueChangeNC": -300 },
+    { "id": 9, "dateTime": "2025-06-17T15:20:00", "productName": "Jóga podložka", "change": "+20 ks", "valueChangeNC": 6000 },
+    { "id": 10, "dateTime": "2025-06-17T15:20:00", "productName": "Činky 5kg", "change": "+20 ks", "valueChangeNC": 12000 },
+    { "id": 11, "dateTime": "2025-06-16T10:00:00", "productName": "Fantasy román", "change": "+50 ks", "valueChangeNC": 7500 },
+    { "id": 12, "dateTime": "2025-06-16T10:00:00", "productName": "Kuchařka", "change": "+75 ks", "valueChangeNC": 15000 },
+    { "id": 13, "dateTime": "2025-06-15T10:25:00", "productName": "Laptop Pro", "change": "-1 ks", "valueChangeNC": -18000 },
+    { "id": 14, "dateTime": "2025-06-15T09:15:00", "productName": "Smartphone X", "change": "+2 ks", "valueChangeNC": 20000 },
+    { "id": 15, "dateTime": "2025-06-15T09:15:00", "productName": "Laptop Pro", "change": "+1 ks", "valueChangeNC": 18000 },
+    { "id": 16, "dateTime": "2025-06-14T16:20:00", "productName": "Smartphone X", "change": "-1 ks", "valueChangeNC": -10000 },
+    { "id": 17, "dateTime": "2025-06-13T14:00:00", "productName": "Sportovní obuv", "change": "-1 ks (Poškozeno)", "valueChangeNC": -1200 },
+    { "id": 18, "dateTime": "2025-06-12T11:30:00", "productName": "Kávovar Deluxe", "change": "+1 ks", "valueChangeNC": 4500 }
+  ]
+}

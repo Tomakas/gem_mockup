@@ -13,5 +13,6 @@ declare module 'vue' {
     ReusableTable: typeof import('./src/components/ReusableTable.vue')['default']
     RouterLink: typeof import('vue-router')['RouterLink']
     RouterView: typeof import('vue-router')['RouterView']
+    StockDocumentDetail: typeof import('./src/components/StockDocumentDetail.vue')['default']
   }
 }
